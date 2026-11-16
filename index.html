@@ -46,10 +46,10 @@ svg.ic{display:block;overflow:visible}
 .app{display:grid;grid-template:"side main" minmax(0,1fr) "credit main" auto / 260px minmax(0,1fr);height:100vh}
 
 /* ---------- sidebar ---------- */
-.credit{grid-area:credit;display:flex;column-gap:6px;align-items:baseline;padding:12px 24px 16px;background:var(--side);font:var(--t-cap);color:var(--t3)}
+.credit{grid-area:credit;display:flex;column-gap:6px;align-items:baseline;padding:12px 24px 16px;background:transparent;font:var(--t-cap);color:var(--t3)}
 .credit a{color:inherit;text-decoration:none;transition:color .2s}
 .credit a:hover,.credit a:focus-visible{color:var(--ink);text-decoration:underline}
-.side{grid-area:side;display:flex;flex-direction:column;padding:19px 12px 16px;background:var(--side);min-height:0;overflow:auto;scrollbar-width:none}
+.side{grid-area:side;display:flex;flex-direction:column;padding:19px 12px 16px;background:transparent;min-height:0;overflow:auto;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
 .brand{padding:10px 12px 0;font:var(--t-body);font-weight:500;height:32px}
 .find{margin:0 0 18px;display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 14px;border-radius:11px;background:var(--fill);transition:background-color .2s,box-shadow .2s}
@@ -60,12 +60,11 @@ svg.ic{display:block;overflow:visible}
 .find kbd{font:var(--t-cap);color:var(--t3);padding:0 7px;border-radius:6px;background:var(--fill)}
 .find.has kbd{display:none}
 .nav{position:relative;display:flex;flex-direction:column;gap:2px}
-.navind{position:absolute;left:0;right:0;top:0;height:38px;border-radius:10px;background:var(--fill2);z-index:0;pointer-events:none;will-change:transform;transform-origin:50% 50%}
-:root{--spring:cubic-bezier(.3,1.35,.5,1)}
+.navind{position:absolute;left:0;right:0;top:0;height:38px;border-radius:10px;background:var(--fill2);z-index:0;pointer-events:none}
+.navind[data-slide]{transition:transform .24s var(--out)}
+@media(prefers-reduced-motion:reduce){.navind[data-slide]{transition:none}}
 .it{position:relative;z-index:1;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:10px;color:var(--t2);text-align:left;font:var(--t-body);transition:background-color .2s,color .2s}
 .it:hover{color:var(--ink)}
-.it:active{transform:scale(.985)}
-.it{transition:background-color .2s,color .2s,transform .2s var(--spring)}
 .it span{flex:1}
 .it em{font:var(--t-cap);font-style:normal;color:var(--t3);font-variant-numeric:tabular-nums}
 .it.on{color:var(--ink);font-weight:500}
@@ -281,6 +280,21 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
   :root{--cell:68px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
+
+/* Subtle warm diffusion behind a translucent sidebar surface. */
+.app{position:relative;isolation:isolate}
+.app::before,.app::after{content:"";position:absolute;inset:0 auto 0 0;width:260px;pointer-events:none;z-index:-1}
+.app::before{background:radial-gradient(ellipse 120% 46% at 3% 20%,rgba(216,181,156,.16),transparent 80%),radial-gradient(ellipse 110% 45% at 92% 84%,rgba(223,192,166,.13),transparent 85%),#f3f2f0}
+.app::after{background:rgba(249,248,247,.4);backdrop-filter:blur(36px) saturate(.85);-webkit-backdrop-filter:blur(36px) saturate(.85)}
+:root[data-theme=dark] .app::before{background:radial-gradient(ellipse 120% 46% at 3% 20%,rgba(163,116,83,.1),transparent 80%),radial-gradient(ellipse 110% 45% at 92% 84%,rgba(150,112,83,.08),transparent 85%),#1c1b1a}
+:root[data-theme=dark] .app::after{background:rgba(27,27,28,.45)}
+/* Continuous corners across UI surfaces; SVG icon geometry stays independent. */
+.find,.find kbd,.navind,.it,.subs button,.seg,.seg button,.seg .ind,.cap,.cb,.tb,.t,.sug button,.theme-toggle,.sheet-card,.sheet-shadow,.sheet,.ipin,.rb,.gbtn,.part-links button,.sizes,.sizes small,.szind,.cmp>div,.bt,.main{corner-shape:superellipse(2)}
+.find{border-radius:15px}.it,.navind{border-radius:14px}.t{border-radius:21px}
+.part-links button{border-radius:14px}.bt{border-radius:16px}
+#close{border-radius:15px}.sheet-shadow{corner-shape:inherit}
+@media(max-width:900px){.app::before,.app::after{width:100%;height:160px;bottom:auto}}
+
 </style>
 </head>
 <body>
@@ -1249,19 +1263,15 @@ function slide(el,axis,from,to,ms=380){
 const groupsOf=k=>[...new Set(ICONS.filter(o=>o.c===k).map(o=>o.g))];
 $('#nav').innerHTML=CATS.map(c=>`<button class="it" data-c="${c.k}"><span>${c.t}</span><em>${ICONS.filter(o=>o.c===c.k).length}</em></button>`).join('');
 const navind=document.createElement('span');navind.className='navind';$('#nav').prepend(navind);
-let navFrom=null;
-function spring(d){const w=2*Math.PI/.42,z=.82,dt=1/240;let x=0,v=0,T=0;const S=[];let acc=0;
-  S.push([0,0]);while(T<1.2){const a=-w*w*(x-1)-2*z*w*v;v+=a*dt;x+=v*dt;T+=dt;acc+=dt;if(acc>=1/60-1e-6){acc=0;S.push([x,v]);if(Math.abs(1-x)<.004&&Math.abs(v)<.05)break;}}
-  S[S.length-1]=[1,0];return {S,ms:(S.length-1)*1000/60};}
-function moveNav(){const on=document.querySelector('.it.on');if(!on){navind.style.opacity='0';navFrom=null;return;}
-  const y=on.offsetTop;navind.style.height=on.offsetHeight+'px';
-  if(navFrom==null||navind.style.opacity==='0'){navind.getAnimations().forEach(a=>a.cancel());navind.style.opacity='1';navind.style.transform=`translateY(${y}px)`;navFrom=y;return;}
-  let from=navFrom;const cs=getComputedStyle(navind).transform;if(cs&&cs!=='none'){try{from=new DOMMatrix(cs).m42}catch(_){}}
-  navind.getAnimations().forEach(a=>a.cancel());navFrom=y;const d=y-from;if(Math.abs(d)<.5){navind.style.transform=`translateY(${y}px)`;return;}
-  const {S,ms}=spring(d);const ad=Math.abs(d);
-  const K=S.map(([x,v])=>({transform:`translateY(${(from+d*x).toFixed(2)}px) scaleY(${(1+Math.min(.06,Math.abs(v)*ad/11000)).toFixed(4)})`}));
-  navind.style.transform=`translateY(${y}px)`;
-  navind.animate(K,{duration:ms,easing:'linear'});}
+function moveNav(){
+  const on=$('.it.on');
+  navind.toggleAttribute('data-slide',!!on&&navind.style.opacity==='1');
+  navind.style.opacity=on?'1':'0';
+  if(on){
+    navind.style.height=on.offsetHeight+'px';
+    navind.style.transform=`translateY(${on.offsetTop}px)`;
+  }
+}
 $('#nav').addEventListener('click',e=>{const it=e.target.closest('.it');if(it){if(q.value){q.value='';$('#find').classList.remove('has')}show(it.dataset.c);return;}
 });
 
