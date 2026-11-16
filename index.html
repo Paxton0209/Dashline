@@ -1995,7 +1995,7 @@ function poseFor(el,from,to){
   return [tx-cx-s*(fx-cx),ty-cy-s*(fy-cy),s];
 }
 let morphs=[];
-function clearMorph(){clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>a.cancel());morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
+function clearMorph(){clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>a.cancel());morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
 function ghostOf(){const g=big.cloneNode(true);g.removeAttribute('id');g.removeAttribute('data-focus');g.classList.add('ghost');g.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));stage.append(g);return g;}
 const trail=[];
 function updateBack(){sheet.classList.toggle('trail',!!trail.length);$('#backname').textContent=trail.length?by[trail.at(-1)].title:'';}
@@ -2003,7 +2003,31 @@ let hoverLock=false;
 
 // Match labels by content so the existing name becomes the back label continuously.
 function captureLabels(){
-  return new Map([$('#iname'),$('#backname')].filter(el=>el.textContent&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>[el.textContent,{rect:el.getBoundingClientRect(),fontSize:parseFloat(getComputedStyle(el).fontSize)*new DOMMatrix(getComputedStyle(el).transform).a,color:getComputedStyle(el).color}]));
+  return new Map([$('#iname'),$('#backname')].filter(el=>el.textContent&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>{
+    const style=getComputedStyle(el),arrow=el.id==='backname'?$('#back svg'):[...document.querySelectorAll('.label-arrow-ghost')].find(g=>g.dataset.label===el.textContent);
+    return [el.textContent,{rect:el.getBoundingClientRect(),fontSize:parseFloat(style.fontSize)*new DOMMatrix(style.transform).a,color:style.color,
+      arrow:arrow?{node:arrow.cloneNode(true),rect:arrow.getBoundingClientRect(),opacity:getComputedStyle(arrow).opacity,color:getComputedStyle(arrow).color}:null}];
+  }));
+}
+function moveLabelArrow(el,previous,target,scale){
+  if(el.id==='backname'){
+    const arrow=$('#back svg'),r=arrow.getBoundingClientRect();
+    // Use the same text anchor, displacement, scale, easing and clock.
+    arrow.style.transformOrigin=`${target.left-r.left}px ${target.top-r.top}px`;
+    motion(arrow,[{transform:`translate(${previous.rect.left-target.left}px,${previous.rect.top-target.top}px) scale(${scale})`},{transform:'none'}],TEXT_MS,0,TEXT_EASE);
+    motion(arrow,[{opacity:previous.arrow?.opacity??0},{opacity:1}],80,0,TEXT_EASE);
+  }else if(previous.arrow){
+    // The back control may leave the layout immediately; its arrow travels with the returning name.
+    const {node:g,rect:r,opacity,color}=previous.arrow;
+    g.removeAttribute('id');g.classList.add('label-arrow-ghost');g.dataset.label=el.textContent;g.setAttribute('aria-hidden','true');
+    Object.assign(g.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',margin:0,pointerEvents:'none',zIndex:60,color,opacity,
+      transform:'none',transformOrigin:`${previous.rect.left-r.left}px ${previous.rect.top-r.top}px`});
+    document.body.append(g);
+    const move=motion(g,[{transform:'none'},{transform:`translate(${target.left-previous.rect.left}px,${target.top-previous.rect.top}px) scale(${1/scale})`}],TEXT_MS,0,TEXT_EASE);
+    const fade=motion(g,[{opacity},{opacity:0}],80,0,TEXT_EASE);
+    fade.onfinish=()=>{};
+    move.onfinish=()=>{g.remove();move.cancel();fade.cancel();};
+  }
 }
 function moveLabels(before,still){
   if(still)return;
@@ -2012,13 +2036,14 @@ function moveLabels(before,still){
     const previous=before.get(el.textContent),r=el.getBoundingClientRect();
     if(previous){
       const a=previous.rect,scale=previous.fontSize/parseFloat(getComputedStyle(el).fontSize);
-      motion(el,[{transform:`translate(${a.left-r.left}px,${a.top-r.top}px) scale(${scale})`,color:previous.color},{transform:'none',color:getComputedStyle(el).color}],360,0,TEXT_EASE);
+      motion(el,[{transform:`translate(${a.left-r.left}px,${a.top-r.top}px) scale(${scale})`,color:previous.color},{transform:'none',color:getComputedStyle(el).color}],TEXT_MS,0,TEXT_EASE);
+      moveLabelArrow(el,previous,r,scale);
     }else motion(el,[{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],180,0,TEXT_EASE);
   }
   if(!asmEl.hidden)motion(asmEl,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],240);
 }
 function stopExtract(){}
-const CAM_MS=400,CAM_EASE='cubic-bezier(.22,.68,0,1)',TEXT_EASE='cubic-bezier(0,0,.58,1)';
+const TEXT_MS=240,CAM_MS=400,CAM_EASE='cubic-bezier(.22,.68,0,1)',TEXT_EASE='cubic-bezier(0,0,.58,1)';
 function motion(el,frames,duration=CAM_MS,delay=0,easing=CAM_EASE){
   const a=el.animate(frames,{duration,delay,easing,fill:'both'});morphs.push(a);
   a.onfinish=()=>a.cancel();return a;
