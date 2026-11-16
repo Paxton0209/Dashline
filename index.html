@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashline</title>
 <meta name="description" content="Dashline is a rule-based cockpit icon system for automotive HMI, including navigation, media, vehicle controls, and climate.">
-<link rel="icon" type="image/png" sizes="32x32" href="../DriveScene-Studio/favicon-32.png">
-<link rel="icon" type="image/png" sizes="64x64" href="../DriveScene-Studio/favicon-64.png">
-<link rel="apple-touch-icon" href="../DriveScene-Studio/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -41,11 +41,13 @@ body{background:radial-gradient(60% 50% at 0% 100%,rgba(255,196,150,.22),transpa
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 input{font:inherit;color:inherit;border:0;outline:0;background:none}
 svg.ic{display:block;overflow:visible}
-.app{display:grid;grid-template-columns:260px 1fr;height:100vh}
+.app{display:grid;grid-template:"side main" minmax(0,1fr) "credit main" auto / 260px minmax(0,1fr);height:100vh}
 
 /* ---------- sidebar ---------- */
-.credit{margin-top:auto;padding:0 12px;font:var(--t-cap);color:var(--t4);text-decoration:none;transition:color .2s}.credit:hover{color:var(--t3)}
-.side{display:flex;flex-direction:column;padding:19px 12px 16px;background:var(--side);min-height:0;overflow:auto;scrollbar-width:none}
+.credit{grid-area:credit;padding:12px 24px 16px;background:var(--side);font:var(--t-cap);color:var(--t3)}
+.credit a{color:inherit;text-decoration:none;transition:color .2s}
+.credit a:hover,.credit a:focus-visible{color:var(--ink);text-decoration:underline}
+.side{grid-area:side;display:flex;flex-direction:column;padding:19px 12px 16px;background:var(--side);min-height:0;overflow:auto;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
 .brand{padding:10px 12px 0;font:var(--t-body);font-weight:500;height:32px}
 .find{margin:0 0 18px;display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 14px;border-radius:11px;background:var(--fill);transition:background-color .2s,box-shadow .2s}
@@ -55,9 +57,6 @@ svg.ic{display:block;overflow:visible}
 .find input::placeholder{color:var(--t3)}
 .find kbd{font:var(--t-cap);color:var(--t3);padding:0 7px;border-radius:6px;background:var(--fill)}
 .find.has kbd{display:none}
-.catalog-brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin-bottom:28px;padding:0 12px}
-.catalog-brand strong{font:600 18px/24px var(--display)}
-.catalog-brand span{font:var(--t-cap);color:var(--t3);flex-basis:100%}
 .nav{position:relative;display:flex;flex-direction:column;gap:2px}
 .navind{position:absolute;left:0;right:0;top:0;height:38px;border-radius:10px;background:var(--fill2);z-index:0;pointer-events:none;will-change:transform;transform-origin:50% 50%}
 :root{--spring:cubic-bezier(.3,1.35,.5,1)}
@@ -91,7 +90,7 @@ svg.ic{display:block;overflow:visible}
 .meta{padding:8px 12px 0;font:var(--t-cap);color:var(--t3)}
 
 /* ---------- content ---------- */
-.main{background:var(--panel);border-left:1px solid var(--hair);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:background-color .4s,border-radius .3s}
+.main{grid-area:main;background:var(--panel);border-left:1px solid var(--hair);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:background-color .4s,border-radius .3s}
 
 .mhead{flex:none;display:flex;align-items:center;gap:12px;height:76px;padding:0 20px 0 36px;border-bottom:1px solid transparent;transition:border-color .2s}
 .mhead.sc{border-bottom-color:var(--hair)}
@@ -272,9 +271,9 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
 
 @media (max-width:900px){
   body{overflow:auto}
-  .app,body.insp .app{grid-template-columns:1fr;height:auto}
+  .app,body.insp .app{grid-template:"side" auto "main" auto "credit" auto / minmax(0,1fr);height:auto}
   .side{padding:16px 12px 0}.foot,.subs,.meta{display:none}
-  .catalog-brand{padding:0 4px;margin-bottom:20px}.catalog-brand span{flex-basis:auto}
+  .credit{padding-inline:18px;background:var(--panel)}
   .find{margin-bottom:8px}
   .nav{flex-direction:row;overflow-x:auto;scrollbar-width:none}.it{flex:none}.it em{display:none}
   .main{margin:12px 0 0;border-radius:16px 16px 0 0;min-height:80vh}
@@ -290,10 +289,8 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
 <body>
 <div class="app">
   <aside class="side">
-    <div class="catalog-brand"><strong>Dashline</strong><span>A rule-based cockpit icon system</span></div>
     <label class="find" id="find"><input id="q" placeholder="Search" autocomplete="off" spellcheck="false"><kbd>/</kbd></label>
     <div class="nav" id="nav"></div>
-    <a class="credit" href="https://github.com/Paxton0209" target="_blank" rel="noopener">Made by Paxton</a>
   </aside>
 
   <section class="main">
@@ -303,6 +300,7 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
     <div class="scroll" id="scroll"><div class="view" id="view"></div></div>
   </section>
 
+  <footer class="credit">Dashline <span aria-hidden="true">·</span> <a href="https://github.com/Paxton0209" target="_blank" rel="noopener">Made by Paxton</a></footer>
 </div>
 
 <div class="veil" id="veil"></div>
