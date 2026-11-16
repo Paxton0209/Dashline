@@ -1909,8 +1909,8 @@ function swapPreview(n,focus){
   if(lensReduced.matches){setBig(n,focus);return;}
   const g=big.cloneNode(true);g.removeAttribute("id");g.classList.add("ghost","preview-ghost");stage.append(g);
   setBig(n,focus);
-  const out=g.animate([{opacity:1},{opacity:0}],{duration:120,easing:"ease-out",fill:"both"});
-  const incoming=big.animate([{opacity:0},{opacity:1}],{duration:160,easing:"ease-out",fill:"both"});
+  const out=g.animate(softenOut,{duration:90,easing:"ease-out",fill:"both"});
+  const incoming=big.animate(sharpenIn,{duration:110,delay:90,easing:"ease-out",fill:"both"});
   previewMotion.push(out,incoming);out.onfinish=()=>{g.remove();out.cancel();};incoming.onfinish=()=>incoming.cancel();
 }
 function setBig(n,focus){big.setAttribute('fill','none');big.innerHTML=inlineSvgBody({s:tagged(n)});big.dataset.n=n;focusPart(focus);}
@@ -2012,18 +2012,20 @@ function moveLabels(before,still){
     const previous=before.get(el.textContent),r=el.getBoundingClientRect();
     if(previous){
       const a=previous.rect,scale=previous.fontSize/parseFloat(getComputedStyle(el).fontSize);
-      motion(el,[{transform:`translate(${a.left-r.left}px,${a.top-r.top}px) scale(${scale})`,color:previous.color},{transform:'none',color:getComputedStyle(el).color}],CAM_MS);
-    }else motion(el,[{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],200);
+      motion(el,[{transform:`translate(${a.left-r.left}px,${a.top-r.top}px) scale(${scale})`,color:previous.color},{transform:'none',color:getComputedStyle(el).color}],360,0,TEXT_EASE);
+    }else motion(el,[{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],180,0,TEXT_EASE);
   }
   if(!asmEl.hidden)motion(asmEl,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],240);
 }
 function stopExtract(){}
-const CAM_MS=400,CAM_EASE='cubic-bezier(.22,.68,0,1)';
-function motion(el,frames,duration=CAM_MS){
-  const a=el.animate(frames,{duration,easing:CAM_EASE,fill:'both'});morphs.push(a);
+const CAM_MS=400,CAM_EASE='cubic-bezier(.22,.68,0,1)',TEXT_EASE='cubic-bezier(0,0,.58,1)';
+function motion(el,frames,duration=CAM_MS,delay=0,easing=CAM_EASE){
+  const a=el.animate(frames,{duration,delay,easing,fill:'both'});morphs.push(a);
   a.onfinish=()=>a.cancel();return a;
 }
-function cam(el,from,to){return motion(el,[artworkStyle(from),artworkStyle(to)]);}
+function cam(el,from,to,duration=CAM_MS,delay=0){return motion(el,[artworkStyle(from),artworkStyle(to)],duration,delay,TEXT_EASE);}
+const softenOut=[{opacity:1,filter:"blur(0px)"},{opacity:0,filter:"blur(3px)"}];
+const sharpenIn=[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0px)"}];
 function movablePart(svgEl,part){
   const hits=svgEl.querySelectorAll(`[data-part="${part}"]`);
   // Repeated or masked shapes have no single complete source to move from.
@@ -2031,7 +2033,7 @@ function movablePart(svgEl,part){
 }
 function blendBig(o,still){
   const g=still?null:ghostOf();fill(o);
-  if(g){const fade=motion(g,[{opacity:1},{opacity:0}],160);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,[{opacity:0},{opacity:1}],200);}
+  if(g){const fade=motion(g,softenOut,100);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);}
 }
 function go(n,{back=false,instant=false}={}){
   if(!by[n]||n===sel||lensState!=='open')return;
@@ -2056,9 +2058,9 @@ function go(n,{back=false,instant=false}={}){
     const g=ghostOf();g.querySelectorAll(`[data-part="${n}"]`).forEach(x=>x.remove());
     fill(by[n]);const b=rectOf(drawn(big));
     if(a&&b){
-      cam(big,poseFor(big,b,a),[0,0,1]);
-      // Only the chosen part moves. Surrounding strokes remain in their original bounds.
-      const fade=motion(g,[{opacity:1},{opacity:0}],140);
+      // Clear the surrounding strokes before the only visible part starts moving.
+      cam(big,poseFor(big,b,a),[0,0,1],300,100);
+      const fade=motion(g,softenOut,100);
       fade.onfinish=()=>{g.remove();fade.cancel();};
     }else g.remove();
   }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
@@ -2066,11 +2068,13 @@ function go(n,{back=false,instant=false}={}){
     fill(by[n]);const holds=big.querySelectorAll(`[data-part="${showingPart}"]`),b=rectOf(holds);
     if(a&&b&&movablePart(big,showingPart)){
       holds.forEach(x=>x.classList.add('hold'));
-      const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b));
-      move.onfinish=()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();};
-      motion(big,[{opacity:0},{opacity:1}],240);
+      const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),280);
+      // Keep the arrived part visible while its surrounding strokes sharpen back in.
+      move.onfinish=()=>{};
+      const reveal=motion(big,sharpenIn,120,280);
+      reveal.onfinish=()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();reveal.cancel();};
     }else{
-      const fade=motion(g,[{opacity:1},{opacity:0}],160);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,[{opacity:0},{opacity:1}],200);
+      const fade=motion(g,softenOut,100);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);
     }
   }else{
     blendBig(by[n],still);
