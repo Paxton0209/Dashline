@@ -8,7 +8,7 @@ Copyright (c) 2026 Paxton Yao. All rights reserved except as granted below.
 
 1. Use Dashline icons, free of charge, in your own products, apps, interfaces, prototypes, designs and client work, including commercial work.
 2. Modify the icons (size, colour, stroke, details) for use in those products and designs.
-3. Show Dashline icons in screenshots, mockups, portfolios, articles and videos, with the credit below.
+3. Show Dashline icons in screenshots, mockups, portfolios, articles and videos, subject to the credit requirements and portfolio exception below.
 
 ## You may not
 
@@ -18,7 +18,7 @@ Copyright (c) 2026 Paxton Yao. All rights reserved except as granted below.
 
 ## Credit
 
-When you share Dashline icons publicly outside a shipped product (posts, portfolios, tutorials, videos, articles), include:
+When you share Dashline icons publicly outside a shipped product or portfolio showcase (posts, tutorials, videos, articles), include:
 
 > Icons: Dashline by Paxton Yao — github.com/Paxton0209/Dashline
 
@@ -44,7 +44,7 @@ For uses not covered here, contact the author through GitHub.
 
 1. 在你自己的产品、应用、界面、原型、设计和客户项目中免费使用 Dashline 图标，包括商业用途。
 2. 为上述用途修改图标（尺寸、颜色、线宽、细节）。
-3. 在截图、效果图、作品集、文章和视频中展示 Dashline 图标，并附上下方署名。
+3. 在截图、效果图、作品集、文章和视频中展示 Dashline 图标，署名要求及作品集豁免见下方条款。
 
 ## 你不可以
 
@@ -54,7 +54,7 @@ For uses not covered here, contact the author through GitHub.
 
 ## 署名
 
-在已发布产品之外公开分享 Dashline 图标时（帖子、作品集、教程、视频、文章），请注明：
+在已发布产品及作品集展示之外公开分享 Dashline 图标时（帖子、教程、视频、文章），请注明：
 
 > 图标：Dashline by Paxton Yao — github.com/Paxton0209/Dashline
 
