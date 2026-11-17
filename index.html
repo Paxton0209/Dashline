@@ -570,6 +570,11 @@ body.leading .stage .keys>g{opacity:1}
   .stage{width:min(22dvh,100px)}
   .ihead{margin-top:4px}
 }
+/* Social destinations stay in the sidebar, separate from icon interactions. */
+.social-links{grid-area:credit;justify-self:center;display:flex;align-items:center;gap:14px;margin:8px 16px 20px}
+.social-links a{display:inline-flex;align-items:center;min-height:32px;color:var(--t3);font:400 14px/20px var(--font);text-decoration:none;text-underline-offset:3px;text-decoration-thickness:1px;white-space:nowrap;transition:color .16s ease-out;-webkit-tap-highlight-color:transparent}
+.social-links a:hover{color:var(--ink);text-decoration:underline}
+.social-links a:focus-visible{color:var(--ink);text-decoration:underline;outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
 </style>
 </head>
 <body>
@@ -593,6 +598,12 @@ body.leading .stage .keys>g{opacity:1}
   </main>
 
     <footer class="credit" id="credit" aria-live="polite"><span id="cname"></span><em id="crel"></em></footer>
+    <nav class="social-links" aria-label="Social links">
+      <a href="https://github.com/Paxton0209/Dashline" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.youtube.com/@PeixinYao-0209" aria-label="YouTube" title="YouTube" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://x.com/Parker_EV_UX" aria-label="X" title="X" target="_blank" rel="noopener noreferrer">X</a>
+      <a href="https://www.xiaohongshu.com/user/profile/59618b7c82ec3953470d5cca" aria-label="Rednote" title="Rednote" target="_blank" rel="noopener noreferrer" class="rednote">Rednote</a>
+    </nav>
 </div>
 
 <div class="tcap" id="tcap" aria-hidden="true"></div>
