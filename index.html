@@ -282,11 +282,11 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
 
-/* Keep enough tint to separate the sidebar even without backdrop filtering. */
+/* Static sidebar tint: no backdrop sampling while modal SVG filters animate. */
 .app{position:relative;isolation:isolate}
 .app::before,.app::after{content:"";position:absolute;inset:0 auto 0 0;width:260px;pointer-events:none;z-index:-1}
 .app::before{background:linear-gradient(to top,rgba(215,171,139,.22) 0%,rgba(215,171,139,.08) 32%,transparent 72%),#f4f4f4}
-.app::after{background:rgba(249,249,249,.38);-webkit-backdrop-filter:blur(20px) saturate(.85);backdrop-filter:blur(20px) saturate(.85)}
+.app::after{background:rgba(249,249,249,.38)}
 :root[data-theme=dark] .app::before{background:linear-gradient(to top,rgba(86,136,156,.14) 0%,rgba(112,119,166,.065) 22%,rgba(112,119,166,.02) 42%,rgba(112,119,166,0) 72%),#1b1b1c}
 :root[data-theme=dark] .app::after{background:rgba(27,27,28,.42)}
 
@@ -344,6 +344,7 @@ svg.ic[data-focus] :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask 
 #iname,#backname{display:inline-block;transform-origin:0 0}
 .asm .pc{overflow:visible}
 .ghost{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;color:var(--icon)}
+.ghost :is(path,circle,rect,line,ellipse,polyline,polygon){transition:none!important}
 .ctx{position:absolute;left:0;right:0;bottom:28px;text-align:center;font:var(--t-cap);color:var(--t3);opacity:0;transition:opacity .12s}
 .ctx.on{opacity:1}
 .sheet{position:fixed}
@@ -1907,9 +1908,9 @@ function clearPreviewMotion(){previewMotion.forEach(a=>a.cancel());previewMotion
 function swapPreview(n,focus){
   clearPreviewMotion();
   if(lensReduced.matches){setBig(n,focus);return;}
-  const g=big.cloneNode(true);g.removeAttribute("id");g.classList.add("ghost","preview-ghost");stage.append(g);
+  const g=ghostOf();g.classList.add("preview-ghost");
   setBig(n,focus);
-  const out=g.animate(softenOut,{duration:90,easing:"ease-out",fill:"both"});
+  const out=g.animate(softenOut,{duration:90,easing:"linear",fill:"both"});
   const incoming=big.animate(sharpenIn,{duration:110,delay:90,easing:"ease-out",fill:"both"});
   previewMotion.push(out,incoming);out.onfinish=()=>{g.remove();out.cancel();};incoming.onfinish=()=>incoming.cancel();
 }
@@ -1996,7 +1997,14 @@ function poseFor(el,from,to){
 }
 let morphs=[];
 function clearMorph(){clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>a.cancel());morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
-function ghostOf(){const g=big.cloneNode(true);g.removeAttribute('id');g.removeAttribute('data-focus');g.classList.add('ghost');g.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));stage.append(g);return g;}
+function ghostOf(){
+  const g=big.cloneNode(true);g.removeAttribute('id');g.classList.add('ghost');
+  // Freeze the current highlight once: hover transitions must not compete with exit blur.
+  const source=big.querySelectorAll(GEOM),copy=g.querySelectorAll(GEOM);
+  source.forEach((el,i)=>{if(!el.closest('mask,clipPath,defs'))copy[i].style.opacity=getComputedStyle(el).opacity;});
+  g.removeAttribute('data-focus');g.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
+  stage.append(g);return g;
+}
 const trail=[];
 function updateBack(){sheet.classList.toggle('trail',!!trail.length);$('#backname').textContent=trail.length?by[trail.at(-1)].title:'';}
 let hoverLock=false;
@@ -2049,7 +2057,8 @@ function motion(el,frames,duration=CAM_MS,delay=0,easing=CAM_EASE){
   a.onfinish=()=>a.cancel();return a;
 }
 function cam(el,from,to,duration=CAM_MS,delay=0){return motion(el,[artworkStyle(from),artworkStyle(to)],duration,delay,TEXT_EASE);}
-const softenOut=[{opacity:1,filter:"blur(0px)"},{opacity:0,filter:"blur(3px)"}];
+// Soften while still legible, then disappear before the replacement starts moving.
+const softenOut=[{offset:0,opacity:1,filter:"blur(0px)"},{offset:.35,opacity:.92,filter:"blur(2px)"},{offset:1,opacity:0,filter:"blur(4px)"}];
 const sharpenIn=[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0px)"}];
 function movablePart(svgEl,part){
   const hits=svgEl.querySelectorAll(`[data-part="${part}"]`);
@@ -2058,7 +2067,7 @@ function movablePart(svgEl,part){
 }
 function blendBig(o,still){
   const g=still?null:ghostOf();fill(o);
-  if(g){const fade=motion(g,softenOut,100);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);}
+  if(g){const fade=motion(g,softenOut,100,0,"linear");fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);}
 }
 function go(n,{back=false,instant=false}={}){
   if(!by[n]||n===sel||lensState!=='open')return;
@@ -2085,7 +2094,7 @@ function go(n,{back=false,instant=false}={}){
     if(a&&b){
       // Clear the surrounding strokes before the only visible part starts moving.
       cam(big,poseFor(big,b,a),[0,0,1],300,100);
-      const fade=motion(g,softenOut,100);
+      const fade=motion(g,softenOut,100,0,"linear");
       fade.onfinish=()=>{g.remove();fade.cancel();};
     }else g.remove();
   }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
@@ -2099,7 +2108,7 @@ function go(n,{back=false,instant=false}={}){
       const reveal=motion(big,sharpenIn,120,280);
       reveal.onfinish=()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();reveal.cancel();};
     }else{
-      const fade=motion(g,softenOut,100);fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);
+      const fade=motion(g,softenOut,100,0,"linear");fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);
     }
   }else{
     blendBig(by[n],still);
