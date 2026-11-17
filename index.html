@@ -367,6 +367,7 @@ svg.ic :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *
 :root:not([data-theme=dark]) .asm button{background:#f4f4f3}
 .asm button:hover,.asm button.hl{background:var(--fill2)}
 :root:not([data-theme=dark]) .asm button:hover,:root:not([data-theme=dark]) .asm button.hl{background:#ebebea}
+.asm button[data-rel=use]{cursor:default}
 .asm button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .asm[data-kind=parts] .ic{width:36px;height:36px}
 .iph .back{display:none;align-items:center;gap:2px;height:32px;margin-left:-8px;padding:0 10px 0 4px;border-radius:var(--ds-radius-control);font:var(--t-cap);color:var(--t2);max-width:100%;transition:background-color .12s,color .12s;corner-shape:superellipse(1.6)}
@@ -2054,7 +2055,7 @@ function fill(o,keepFocus,preserveDrawing=false){
   const relationLabel=$('#relation-label');relationLabel.textContent=kind==='parts'?'Parts':'Used in';relationLabel.hidden=!names.length;
   asm.append(...names.map(n=>{
     const b=document.createElement('button');b.type='button';b.dataset.inspect=n;b.dataset.rel=kind==='parts'?'part':'use';
-    b.setAttribute('aria-label',by[n].title);
+    b.setAttribute('aria-label',(kind==='uses'?'Preview ':'')+by[n].title);
     b.innerHTML=kind==='parts'?partSvg(n):focusSvg(n,part);
     return b;
   }));
@@ -2411,6 +2412,8 @@ function blendBig(o,still){
 }
 function go(n,{back=false,instant=false}={}){
   if(!by[n]||n===sel||lensState!=='open')return;
+  // Usage cards preview only: the navigation trail ends at the selected part.
+  if(!back&&by[sel]?.c==='part'&&by[n].c!=='part')return;
   const labels=captureLabels();
   // Save the visible component position before cancelling an interrupted movement.
   const visiblePart=by[big.dataset.n]?.c==='part'?rectOf(drawn(big)):null;
@@ -2478,12 +2481,12 @@ function releaseHoverLock(e){
 }
 sheet.addEventListener('pointermove',releaseHoverLock,{passive:true});
 let hovered=null;
-asmEl.addEventListener('pointermove',e=>{releaseHoverLock(e);if(hoverLock||morphs.some(a=>a.playState==='running'))return;const b=e.target.closest('[data-inspect]');if(b&&b!==hovered){hovered=b;hoverTile(b);}});
+asmEl.addEventListener('pointermove',e=>{releaseHoverLock(e);if(hoverLock||morphs.some(a=>a.playState==='running'))return;const b=e.target.closest('[data-inspect]');if(b!==hovered){hovered=b;hoverTile(b);}});
 asmEl.addEventListener('pointerleave',()=>{hovered=null;});
 asmEl.addEventListener('pointerleave',()=>hoverTile(null));
 asmEl.addEventListener('focusin',e=>{const b=e.target.closest('[data-inspect]');if(b)hoverTile(b);});
 asmEl.addEventListener('focusout',e=>{if(!asmEl.contains(e.relatedTarget))hoverTile(null);});
-asmEl.addEventListener('click',e=>{const b=e.target.closest('[data-inspect]');if(b)go(b.dataset.inspect,{instant:e.detail===0});});
+asmEl.addEventListener('click',e=>{const b=e.target.closest('[data-inspect]');if(!b)return;if(b.dataset.rel==='use'){hoverTile(b);return;}go(b.dataset.inspect,{instant:e.detail===0});});
 // The left preview is display-only; all navigation belongs to the right controls.
 
 $('#view').addEventListener('click',e=>{
