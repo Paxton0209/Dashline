@@ -528,6 +528,11 @@ body.leading .stage .keys>g{opacity:1}
 .rghost .tree path{fill:none;stroke:color-mix(in srgb,var(--ink) 22%,var(--panel));stroke-width:1;shape-rendering:crispEdges}
 .tree[hidden]+.asm[data-kind]{margin-top:20px}
 
+#tree{display:none}
+.relation-label{flex:none;margin:24px 0 8px;font:var(--t-cap);color:var(--t3)}
+.relation-label[hidden]{display:none}
+@media(max-width:620px),(max-height:520px){.relation-label{margin-top:16px}}
+
 /* ---- one take: the icon never leaves; the camera moves, or a component moves ---- */
 .tree path{stroke:color-mix(in srgb,var(--ink) 42%,var(--panel));stroke-width:1.5;shape-rendering:auto;stroke-linecap:round;stroke-linejoin:round}
 .tree path.hl{stroke:var(--ink)}
@@ -614,7 +619,8 @@ body.leading .stage .keys>g{opacity:1}
     </div>
     <div class="ihead"><div class="iname" id="iname" tabindex="-1"></div><div class="ipath" id="ipath"></div></div>
     <svg class="tree" id="tree" aria-hidden="true"></svg>
-    <section class="asm" id="part-links" aria-label="Component parts" hidden></section>
+    <h2 class="relation-label" id="relation-label" hidden></h2>
+    <section class="asm" id="part-links" aria-labelledby="relation-label" hidden></section>
     <div class="acts2">
       <button class="bt pri" id="cSvg" type="button" aria-label="Copy SVG">
         <span class="svg-copy-idle" aria-hidden="true">Copy SVG</span>
@@ -1435,6 +1441,10 @@ for(const name of ['upload','download']){
   partVariants['part/direction_arrow:'+name]=arrow;
   icon.s=icon.s.replace(arrow,'{{part/direction_arrow:'+name+'}}');
 }
+// Preserve Fast charge's optical variant while joining the shared bolt family.
+const fastChargeBolt=by['vehicle/fast_charge'].s.match(/<path\b[^>]*\/>/)[0];
+partVariants['part/bolt:fast_charge']=fastChargeBolt;
+by['vehicle/fast_charge'].s=by['vehicle/fast_charge'].s.replace(fastChargeBolt,'{{part/bolt:fast_charge}}');
 const partUsage=new Map(ICONS.filter(o=>o.c==='part').map(o=>[o.n,[]]));
 const resolving=new Set();
 function resolveIcon(o){
@@ -1684,8 +1694,8 @@ function directParts(n){
   if(o.off)r.push('part/off_slash');
   return [...new Set(r)];
 }
-// Inspector relationships always descend into the actual assembly. A reference
-// to the whole drawing is transparent; a terminal symbol has no child cards.
+// Whole-icon pages show actual assembly instances. Entered parts show their
+// users; a terminal whole icon never turns into an inverse-usage page.
 const inspections=new Map();
 const inspectionTitles={
   'general/swap':['Right arrow','Left arrow'],
@@ -1758,6 +1768,10 @@ function focusLayers(body,part){
   return `<g class="focus-rest">${rest.innerHTML}</g><g class="focus-ink">${ink.innerHTML}</g>`;
 }
 function focusSvg(n,part){
+  // Knockout-only components (battery bolts) live in masks, not painted ink.
+  // Keep their full icon legible instead of fading the entire drawing.
+  const root=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${tagged(n)}</svg>`,'image/svg+xml');
+  if(![...root.querySelectorAll(partSelector(part))].some(e=>!e.closest('defs,mask,clipPath')))return svg(by[n]);
   return `<svg class="ic" viewBox="0 0 48 48" fill="none" data-focus aria-hidden="true">${focusLayers(inlineSvgBody({s:tagged(n)}),part)}</svg>`;
 }
 const A='viewBox="0 0 48 48" fill="none"';
@@ -2024,18 +2038,24 @@ const jsxOut=(o,px)=>{const nm=o.b.split('_').map(w=>w[0].toUpperCase()+w.slice(
   const body=flat(o.s).replace(/\s([a-z]+)-([a-z])([a-z-]*)=/g,(m,a,b,c)=>' '+a+b.toUpperCase()+c.replace(/-([a-z])/g,(x,y)=>y.toUpperCase())+'=').replace(/><(?=[a-z])/g,'>\n      <');
   return `export function ${nm}({ size = ${px}, ...props }) {\n  return (\n    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" {...props}>\n      ${body}\n    </svg>\n  );\n}`;};
 let sel=null;
+function inspectorLinks(o){
+  const part=o.originPart||(o.c==='part'?o.n:null);
+  return part?{kind:'uses',part,names:[...new Set(partUsage.get(part)||[])].filter(n=>by[n].c!=='part')}:
+    {kind:'parts',part:null,names:inspection(o.n).entries};
+}
 function fill(o,keepFocus,preserveDrawing=false){
   $('#crumb').textContent=`${CT[o.c].t} / ${o.g}`;
   $('#iname').textContent=o.title;
   $('#ipath').innerHTML=`<span>${o.n}</span>`+RULE(o).map(r=>`<span class="r">${r}</span>`).join('');
   if(!preserveDrawing||big.dataset.n!==o.n)setBig(o.n,keepFocus);
-  const asm=$('#part-links'),names=inspection(o.n).entries;
+  const asm=$('#part-links'),{names,kind,part}=inspectorLinks(o);
   asm.replaceChildren();leads.replaceChildren();
-  asm.dataset.kind='parts';
+  asm.dataset.kind=kind;
+  const relationLabel=$('#relation-label');relationLabel.textContent=kind==='parts'?'Parts':'Used in';relationLabel.hidden=!names.length;
   asm.append(...names.map(n=>{
-    const b=document.createElement('button');b.type='button';b.dataset.inspect=n;b.dataset.rel='part';
+    const b=document.createElement('button');b.type='button';b.dataset.inspect=n;b.dataset.rel=kind==='parts'?'part':'use';
     b.setAttribute('aria-label',by[n].title);
-    b.innerHTML=partSvg(n);
+    b.innerHTML=kind==='parts'?partSvg(n):focusSvg(n,part);
     return b;
   }));
   asm.hidden=!names.length;
@@ -2180,7 +2200,7 @@ function swapPreview(n,focus){
 function setBig(n,focus){big.setAttribute('fill','none');big._focusBody=inlineSvgBody({s:inspection(n).body});big._focusPart=null;big.innerHTML=big._focusBody;big.dataset.n=n;focusPart(focus);}
 function focusPart(p){
   if(p&&p!==big._focusPart){big.innerHTML=focusLayers(big._focusBody,p);big._focusPart=p;}
-  const hit=p&&big.querySelector(`${partSelector(p)}.hl`);
+  const hit=p&&[...big.querySelectorAll(`${partSelector(p)}.hl`)].some(e=>!e.closest('defs,mask,clipPath'));
   big.toggleAttribute('data-focus',!!hit);
   asmEl.querySelectorAll('button').forEach(b=>b.classList.toggle('hl',!!p&&b.dataset.rel==='part'&&b.dataset.inspect===p));
   leads.querySelectorAll('g[data-n]').forEach(g=>g.classList.toggle('hl',!!p&&g.dataset.n===p));
@@ -2320,6 +2340,7 @@ function moveLabels(before,still){
       moveLabelArrow(el,previous,r,scale);
     }else motion(el,[{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],180,0,TEXT_EASE);
   }
+  if(!asmEl.hidden)motion($('#relation-label'),[{opacity:0},{opacity:1}],180);
   if(!asmEl.hidden)motion(asmEl,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],240);
 }
 function stopExtract(){}
@@ -2396,7 +2417,12 @@ function go(n,{back=false,instant=false}={}){
   clearMorph();stopExtract();clearTimeout(previewT);hoverLock=true;hovered=null;
   const from=sel,still=instant||lensReduced.matches;
   if(!back)trail.push(from);
-  if(preview){preview=null;setBig(from);}
+  if(preview===n){
+    preview=null;clearPreviewMotion();say('');sel=n;markTile(selectedTile(n));
+    fill(by[n],null,true);focusPart(null);updateBack();layoutLeads();moveLabels(labels,still);
+    if(instant)$('#iname').focus({preventScroll:true});return;
+  }
+  if(preview){preview=null;clearPreviewMotion();setBig(from);}
   say('');focusPart(null);
   sel=n;markTile(selectedTile(n));
   const showing=big.dataset.n,showingPart=by[showing]?.c==='part'?showing:null;
@@ -2440,7 +2466,10 @@ function hoverTile(b){
   if(morphs.some(a=>a.playState==='running'))return;
   if(!b){previewT=setTimeout(()=>{if(preview){preview=null;swapPreview(sel);}focusPart(null);say('');},90);return;}
   const n=b.dataset.inspect;
-  focusPart(n);say(by[n].title);
+  if(b.dataset.rel==='use'){
+    if(preview!==n){preview=n;swapPreview(n,by[sel].originPart||sel);}
+  }else focusPart(n);
+  say(by[n].title);
 }
 let pointerPosition=null;
 function releaseHoverLock(e){
