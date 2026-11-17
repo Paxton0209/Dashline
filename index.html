@@ -2056,7 +2056,28 @@ function motion(el,frames,duration=CAM_MS,delay=0,easing=CAM_EASE){
   const a=el.animate(frames,{duration,delay,easing,fill:'both'});morphs.push(a);
   a.onfinish=()=>a.cancel();return a;
 }
-function cam(el,from,to,duration=CAM_MS,delay=0){return motion(el,[artworkStyle(from),artworkStyle(to)],duration,delay,TEXT_EASE);}
+function cam(el,from,to,duration=200,delay=0){
+  const move=motion(el,[artworkStyle(from),artworkStyle(to)],duration,delay,TEXT_EASE),strokes=[];
+  // Compensate CSS zoom in the same WAAPI clock, keeping screen-space line weight fixed.
+  el.querySelectorAll(GEOM).forEach(path=>{
+    if(path.closest('defs,mask,clipPath'))return;
+    const css=getComputedStyle(path),d=path.getAttribute('d'),prev=path.previousElementSibling;
+    if(css.stroke==='none'||(d&&prev?.getAttribute('d')===d&&prev.getAttribute('fill')===path.getAttribute('stroke')))return;
+    const width=parseFloat(css.strokeWidth);
+    const frames=Array.from({length:81},(_,i)=>{const t=i/80,s=from[2]+(to[2]-from[2])*t;return {offset:t,strokeWidth:`${width/s}px`};});
+    const a=motion(path,frames,duration,delay,TEXT_EASE);a.onfinish=()=>{};strokes.push(a);
+  });
+  move.addEventListener('cancel',()=>strokes.forEach(a=>a.cancel()),{once:true});
+  return move;
+}
+function partPaintKinds(roots){
+  const kinds=new Set();
+  for(const root of roots)for(const el of [root,...root.querySelectorAll(GEOM)]){
+    if(!el.matches(GEOM)||el.closest('defs,mask,clipPath'))continue;
+    const s=getComputedStyle(el);if(s.fill!=='none')kinds.add('fill');if(s.stroke!=='none')kinds.add('stroke');
+  }
+  return [...kinds].sort().join(',');
+}
 // Soften while still legible, then disappear before the replacement starts moving.
 const softenOut=[{offset:0,opacity:1,filter:"blur(0px)"},{offset:.35,opacity:.92,filter:"blur(2px)"},{offset:1,opacity:0,filter:"blur(4px)"}];
 const sharpenIn=[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0px)"}];
@@ -2088,24 +2109,28 @@ function go(n,{back=false,instant=false}={}){
   sel=n;markTile(selectedTile(n));
   const showing=big.dataset.n,showingPart=by[showing]?.componentAlias||(by[showing]?.c==='part'?showing:null);
   if(!still&&by[n].c==='part'&&movablePart(big,n)){
-    const a=rectOf(big.querySelectorAll(`[data-part="${n}"]`));
-    const g=ghostOf();g.querySelectorAll(`[data-part="${n}"]`).forEach(x=>x.remove());
+    const source=big.querySelectorAll(`[data-part="${n}"]`),a=rectOf(source),paints=partPaintKinds(source);
+    const g=ghostOf();
     fill(by[n]);const b=rectOf(drawn(big));
-    if(a&&b){
+    if(a&&b&&paints===partPaintKinds(drawn(big))){
+      g.querySelectorAll(`[data-part="${n}"]`).forEach(x=>x.remove());
       // Clear the surrounding strokes before the only visible part starts moving.
-      cam(big,poseFor(big,b,a),[0,0,1],300,100);
+      cam(big,poseFor(big,b,a),[0,0,1],200,100);
       const fade=motion(g,softenOut,100,0,"linear");
       fade.onfinish=()=>{g.remove();fade.cancel();};
-    }else g.remove();
+    }else{
+      // Solid and outlined variants have different silhouettes; do not swap one mid-zoom.
+      const fade=motion(g,softenOut,100,0,'linear');fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,100,100);
+    }
   }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
     const a=visiblePart||rectOf(drawn(big)),g=ghostOf();
     fill(by[n]);const holds=big.querySelectorAll(`[data-part="${showingPart}"]`),b=rectOf(holds);
-    if(a&&b&&movablePart(big,showingPart)){
+    if(a&&b&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)){
       holds.forEach(x=>x.classList.add('hold'));
-      const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),280);
+      const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),200);
       // Keep the arrived part visible while its surrounding strokes sharpen back in.
       move.onfinish=()=>{};
-      const reveal=motion(big,sharpenIn,120,280);
+      const reveal=motion(big,sharpenIn,100,200);
       reveal.onfinish=()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();reveal.cancel();};
     }else{
       const fade=motion(g,softenOut,100,0,"linear");fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);
