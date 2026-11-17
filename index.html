@@ -365,8 +365,8 @@ svg.ic :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *
 .asm::-webkit-scrollbar{display:none}
 .asm button{display:grid;place-items:center;border-radius:var(--ds-radius-control);background:var(--fill);color:var(--icon);transition:background-color .12s;corner-shape:superellipse(1.6)}
 :root:not([data-theme=dark]) .asm button{background:#f4f4f3}
-.asm button:hover,.asm button.hl{background:var(--fill2)}
-:root:not([data-theme=dark]) .asm button:hover,:root:not([data-theme=dark]) .asm button.hl{background:#ebebea}
+.asm[data-kind=parts] button:hover,.asm[data-kind=parts] button.hl{background:var(--fill2)}
+:root:not([data-theme=dark]) .asm[data-kind=parts] button:hover,:root:not([data-theme=dark]) .asm[data-kind=parts] button.hl{background:#ebebea}
 .asm button[data-rel=use]{cursor:default}
 .asm button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .asm[data-kind=parts] .ic{width:36px;height:36px}
