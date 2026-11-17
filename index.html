@@ -333,9 +333,11 @@ body.xray .scroll{padding-bottom:140px}
 .t.dim .ic{opacity:.16;transition:opacity .16s}
 .t .ic{transition:opacity .16s}
 
-/* Shared: an svg with data-focus keeps .hl in ink and fades the rest. */
+/* Composite the surroundings once, so crossing strokes do not accumulate alpha. */
+svg.ic .focus-rest{opacity:1;transition:opacity .16s cubic-bezier(.2,0,0,1)}
+svg.ic[data-focus] .focus-rest{opacity:.38}
 svg.ic :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *){transition:opacity .16s cubic-bezier(.2,0,0,1)}
-svg.ic[data-focus] :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *,.hl *){opacity:.16}
+
 
 /* ---- Dialog: name, a drawing of the relationship, one action. ---- */
 #big{pointer-events:none}
@@ -406,7 +408,7 @@ body.xray .scroll{padding-bottom:80px}
 @media (max-width:900px){.xp{display:none}}
 
 /* three levels: the component, the rest of its icon, unrelated icons */
-svg.ic[data-focus] :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *,.hl *){opacity:.5}
+
 .t.dim .ic{opacity:.2}
 
 /* dialog: back and title read as one hierarchy */
@@ -447,7 +449,7 @@ body.xray .main{border-right:0}
 @media (max-width:900px){.anat{display:none}}
 
 /* other strokes of the same icon */
-svg.ic[data-focus] :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *,.hl *){opacity:.38}
+
 
 /* ---- dialog: no leader lines; components line up with where they are drawn ---- */
 .leads{display:none}
@@ -542,7 +544,7 @@ body.leading .stage .keys>g{opacity:1}
 .flyer{position:absolute;z-index:5;pointer-events:none;overflow:visible;color:var(--icon)}
 .flyer :is(path,circle,rect,line,ellipse,polyline,polygon):not(.keep *):not(mask *,clipPath *){visibility:hidden}
 .asm button.pre svg.ic{visibility:hidden}
-.asm button.arr svg.ic[data-focus] :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *,.hl *){animation:restin .45s cubic-bezier(.23,1,.32,1) both}
+.asm button.arr svg.ic[data-focus] .focus-rest{animation:restin .45s cubic-bezier(.23,1,.32,1) both}
 @keyframes restin{from{opacity:0}}
 .anat{display:none}
 </style>
@@ -1477,6 +1479,35 @@ function normalizeIconStrokes(o){
   if(changed)o.s=strokePreview.innerHTML;
   strokePreview.replaceChildren();
 }
+// Shared component geometry: preserve instance centre and area; never rescale the icon as a whole.
+Object.assign(partVariants,{
+  "part/navigation_pointer:follow_route": "<g transform=\"translate(28.7890034 30.4039497) scale(0.5262111) translate(-24.000001 -23.4224434)\"><path d=\"M22.762 11.800A1.350 1.350 0 0 1 25.238 11.800L34.868 33.969A1.350 1.350 0 0 1 33.081 35.740L24.483 31.915A1.188 1.188 0 0 0 23.517 31.915L14.919 35.740A1.350 1.350 0 0 1 13.132 33.969Z\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\"/></g>",
+  "part/navigation_pointer:compass": "<g transform=\"translate(23.4000015 23.574789) scale(0.4276826) translate(-24.000001 -23.4224434)\"><path fill=\"currentColor\" d=\"M22.762 11.800A1.350 1.350 0 0 1 25.238 11.800L34.868 33.969A1.350 1.350 0 0 1 33.081 35.740L24.483 31.915A1.188 1.188 0 0 0 23.517 31.915L14.919 35.740A1.350 1.350 0 0 1 13.132 33.969Z\"   /></g>",
+  "part/navigation_pointer:phone_key": "<g transform=\"translate(24 23.7422953) scale(0.3336536) translate(-24.000001 -23.4224434)\"><path fill=\"currentColor\" d=\"M22.762 11.800A1.350 1.350 0 0 1 25.238 11.800L34.868 33.969A1.350 1.350 0 0 1 33.081 35.740L24.483 31.915A1.188 1.188 0 0 0 23.517 31.915L14.919 35.740A1.350 1.350 0 0 1 13.132 33.969Z\"   /></g>",
+  "part/weather_cloud:precipitation": "<g transform=\"translate(24.0057039 18.6220555) scale(0.8025115) translate(-23.8399382 -23.9735508)\"><path d=\"M15.4931 33.944C13.8241 33.996 12.2021 33.383 10.9851 32.24C9.76806 31.097 9.05506 29.517 9.00306 27.848C8.95106 26.179 9.56406 24.557 10.7071 23.34C11.8501 22.123 13.4301 21.41 15.0991 21.358C15.4691 19.413 16.4661 17.642 17.9391 16.318C19.4121 14.995 21.2781 14.191 23.2521 14.03C25.2261 13.869 27.1981 14.36 28.8651 15.429C30.5331 16.497 31.8041 18.082 32.4831 19.942C34.1671 20.154 35.7191 20.964 36.8561 22.224C37.9931 23.484 38.6401 25.111 38.6781 26.807C38.7161 28.504 38.1431 30.158 37.0641 31.468C35.9851 32.778 34.4711 33.657 32.7981 33.944H15.4931Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>",
+  "part/weather_cloud:precipitation_color": "<g transform=\"translate(24.0057039 18.6220555) scale(0.8025115) translate(-23.8399382 -23.9735508)\"><path d=\"M15.4931 33.944C13.8241 33.996 12.2021 33.383 10.9851 32.24C9.76806 31.097 9.05506 29.517 9.00306 27.848C8.95106 26.179 9.56406 24.557 10.7071 23.34C11.8501 22.123 13.4301 21.41 15.0991 21.358C15.4691 19.413 16.4661 17.642 17.9391 16.318C19.4121 14.995 21.2781 14.191 23.2521 14.03C25.2261 13.869 27.1981 14.36 28.8651 15.429C30.5331 16.497 31.8041 18.082 32.4831 19.942C34.1671 20.154 35.7191 20.964 36.8561 22.224C37.9931 23.484 38.6401 25.111 38.6781 26.807C38.7161 28.504 38.1431 30.158 37.0641 31.468C35.9851 32.778 34.4711 33.657 32.7981 33.944H15.4931Z\" fill=\"url(#cloud-white)\" stroke=\"#A3AAB4\" stroke-width=\"0.9\" stroke-linejoin=\"round\"/></g>",
+  "part/weather_cloud:storm": "<g transform=\"translate(23.9998636 17.7620564) scale(0.8025106) translate(-23.8399382 -23.9735508)\"><path d=\"M15.4931 33.944C13.8241 33.996 12.2021 33.383 10.9851 32.24C9.76806 31.097 9.05506 29.517 9.00306 27.848C8.95106 26.179 9.56406 24.557 10.7071 23.34C11.8501 22.123 13.4301 21.41 15.0991 21.358C15.4691 19.413 16.4661 17.642 17.9391 16.318C19.4121 14.995 21.2781 14.191 23.2521 14.03C25.2261 13.869 27.1981 14.36 28.8651 15.429C30.5331 16.497 31.8041 18.082 32.4831 19.942C34.1671 20.154 35.7191 20.964 36.8561 22.224C37.9931 23.484 38.6401 25.111 38.6781 26.807C38.7161 28.504 38.1431 30.158 37.0641 31.468C35.9851 32.778 34.4711 33.657 32.7981 33.944H15.4931Z\" stroke-width=\"1.932367\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>",
+  "part/weather_cloud:storm_color": "<g transform=\"translate(23.9998636 17.7620564) scale(0.8025106) translate(-23.8399382 -23.9735508)\"><path d=\"M15.4931 33.944C13.8241 33.996 12.2021 33.383 10.9851 32.24C9.76806 31.097 9.05506 29.517 9.00306 27.848C8.95106 26.179 9.56406 24.557 10.7071 23.34C11.8501 22.123 13.4301 21.41 15.0991 21.358C15.4691 19.413 16.4661 17.642 17.9391 16.318C19.4121 14.995 21.2781 14.191 23.2521 14.03C25.2261 13.869 27.1981 14.36 28.8651 15.429C30.5331 16.497 31.8041 18.082 32.4831 19.942C34.1671 20.154 35.7191 20.964 36.8561 22.224C37.9931 23.484 38.6401 25.111 38.6781 26.807C38.7161 28.504 38.1431 30.158 37.0641 31.468C35.9851 32.778 34.4711 33.657 32.7981 33.944H15.4931Z\" fill=\"url(#cloud-white)\" stroke=\"#A3AAB4\" stroke-width=\"0.869565\" stroke-linejoin=\"round\"/></g>",
+  "part/phone_frame:remote_climate": "<g transform=\"translate(19 24) scale(0.8043997) translate(-24 -24)\"><rect x=\"15.5\" y=\"10\" width=\"17\" height=\"28\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"2.094241\"/></g>",
+  "part/phone_frame:projection": "<g transform=\"translate(16.5 27.5) scale(0.61494) translate(-24 -24)\"><rect x=\"15.5\" y=\"10\" width=\"17\" height=\"28\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"2.094241\"/></g>",
+  "part/phone_frame:wireless": "<g transform=\"translate(24 24) scale(0.7778445) translate(-24 -24)\"><rect x=\"15.5\" y=\"10\" width=\"17\" height=\"28\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"2.094241\"/></g>",
+  "part/phone_frame:remote": "<g transform=\"translate(19.25 24) scale(0.9701425) translate(-24 -24)\"><rect x=\"15.5\" y=\"10\" width=\"17\" height=\"28\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"2.094241\"/></g>",
+  "part/camera:parking": "<g transform=\"translate(24 24) scale(0.6099375) translate(-24 -24)\"><path d=\"M12 19.5C12 18.7044 12.3161 17.9413 12.8787 17.3787C13.4413 16.8161 14.2044 16.5 15 16.5H18.5L20.5 13.5H27.5L29.5 16.5H33C33.7956 16.5 34.5587 16.8161 35.1213 17.3787C35.6839 17.9413 36 18.7044 36 19.5V31.5C36 32.2956 35.6839 33.0587 35.1213 33.6213C34.5587 34.1839 33.7956 34.5 33 34.5H15C14.2044 34.5 13.4413 34.1839 12.8787 33.6213C12.3161 33.0587 12 32.2956 12 31.5V19.5Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M19 25.5C19 26.8261 19.5268 28.0979 20.4645 29.0355C21.4021 29.9732 22.6739 30.5 24 30.5C25.3261 30.5 26.5979 29.9732 27.5355 29.0355C28.4732 28.0979 29 26.8261 29 25.5C29 24.1739 28.4732 22.9021 27.5355 21.9645C26.5979 21.0268 25.3261 20.5 24 20.5C22.6739 20.5 21.4021 21.0268 20.4645 21.9645C19.5268 22.9021 19 24.1739 19 25.5Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>",
+  "part/video_camera:dashcam": "<g transform=\"translate(23.9251003 23.7999992) scale(1.0054999) translate(-24 -24)\"><path d=\"M29.5 21C29.5 18.7435 29.5 17 29.5 17C29.5 16.4696 29.2893 15.9609 28.9142 15.5858C28.5391 15.2107 28.0304 15 27.5 15H13.5C12.9696 15 12.4609 15.2107 12.0858 15.5858C11.7107 15.9609 11.5 16.4696 11.5 17V31C11.5 31.5304 11.7107 32.0391 12.0858 32.4142C12.4609 32.7893 12.9696 33 13.5 33H27.5C28.0304 33 28.5391 32.7893 28.9142 32.4142C29.2893 32.0391 29.5 31.5304 29.5 31C29.5 31 29.5 29.2565 29.5 27M29.5 21C29.5 22.8812 29.5 25.1188 29.5 27M29.5 21L34.2558 18.2824C35.2558 17.711 36.5 18.433 36.5 19.5848V28.4152C36.5 29.567 35.2558 30.289 34.2558 29.7176L29.5 27\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>",
+  "part/play_triangle:previous": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(48 0) scale(-1 1)\"><g transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path d=\"M15.9736 15.4321C15.9742 14.9982 16.0906 14.5722 16.311 14.1984C16.5314 13.8246 16.8477 13.5164 17.2272 13.3059C17.6066 13.0953 18.0353 12.9899 18.4692 13.0008C18.9029 13.0115 19.3261 13.138 19.6945 13.3671L36.0491 23.585C36.3993 23.8039 36.6881 24.1083 36.8883 24.4695C37.0886 24.8307 37.1936 25.237 37.1936 25.65C37.1936 26.063 37.0886 26.4692 36.8883 26.8305C36.6881 27.1918 36.3993 27.4961 36.0491 27.715L19.6945 37.9329C19.3261 38.162 18.9029 38.2886 18.4692 38.2993C18.0353 38.31 17.6066 38.2047 17.2272 37.9941C16.8477 37.7835 16.5314 37.4754 16.311 37.1016C16.0906 36.7277 15.9742 36.3019 15.9736 35.8679V15.4321Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g></g>",
+  "part/play_triangle:next": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path d=\"M15.9736 15.4321C15.9742 14.9982 16.0906 14.5722 16.311 14.1984C16.5314 13.8246 16.8477 13.5164 17.2272 13.3059C17.6066 13.0953 18.0353 12.9899 18.4692 13.0008C18.9029 13.0115 19.3261 13.138 19.6945 13.3671L36.0491 23.585C36.3993 23.8039 36.6881 24.1083 36.8883 24.4695C37.0886 24.8307 37.1936 25.237 37.1936 25.65C37.1936 26.063 37.0886 26.4692 36.8883 26.8305C36.6881 27.1918 36.3993 27.4961 36.0491 27.715L19.6945 37.9329C19.3261 38.162 18.9029 38.2886 18.4692 38.2993C18.0353 38.31 17.6066 38.2047 17.2272 37.9941C16.8477 37.7835 16.5314 37.4754 16.311 37.1016C16.0906 36.7277 15.9742 36.3019 15.9736 35.8679V15.4321Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>",
+  "part/play_triangle:previous_solid": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(48 0) scale(-1 1)\"><g transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path fill=\"currentColor\" d=\"M15.9736 15.4321C15.9742 14.9982 16.0906 14.5722 16.311 14.1984C16.5314 13.8246 16.8477 13.5164 17.2272 13.3059C17.6066 13.0953 18.0353 12.9899 18.4692 13.0008C18.9029 13.0115 19.3261 13.138 19.6945 13.3671L36.0491 23.585C36.3993 23.8039 36.6881 24.1083 36.8883 24.4695C37.0886 24.8307 37.1936 25.237 37.1936 25.65C37.1936 26.063 37.0886 26.4692 36.8883 26.8305C36.6881 27.1918 36.3993 27.4961 36.0491 27.715L19.6945 37.9329C19.3261 38.162 18.9029 38.2886 18.4692 38.2993C18.0353 38.31 17.6066 38.2047 17.2272 37.9941C16.8477 37.7835 16.5314 37.4754 16.311 37.1016C16.0906 36.7277 15.9742 36.3019 15.9736 35.8679V15.4321Z\"/></g></g>",
+  "part/play_triangle:next_solid": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path fill=\"currentColor\" d=\"M15.9736 15.4321C15.9742 14.9982 16.0906 14.5722 16.311 14.1984C16.5314 13.8246 16.8477 13.5164 17.2272 13.3059C17.6066 13.0953 18.0353 12.9899 18.4692 13.0008C18.9029 13.0115 19.3261 13.138 19.6945 13.3671L36.0491 23.585C36.3993 23.8039 36.6881 24.1083 36.8883 24.4695C37.0886 24.8307 37.1936 25.237 37.1936 25.65C37.1936 26.063 37.0886 26.4692 36.8883 26.8305C36.6881 27.1918 36.3993 27.4961 36.0491 27.715L19.6945 37.9329C19.3261 38.162 18.9029 38.2886 18.4692 38.2993C18.0353 38.31 17.6066 38.2047 17.2272 37.9941C16.8477 37.7835 16.5314 37.4754 16.311 37.1016C16.0906 36.7277 15.9742 36.3019 15.9736 35.8679V15.4321Z\"/></g>"
+});
+by["drive/charging_layer"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 0) translate(23.84 17.48) scale(0.8243179) translate(-24 -24)\">{{part/bolt}}</g><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M11 26.036L22.883 31.9775C23.4854 32.2787 24.1946 32.2787 24.797 31.9775L36.68 26.036M11 31.921L22.883 37.8625C23.4854 38.1637 24.1946 38.1637 24.797 37.8625L36.68 31.921\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>";
+by["vehicle/v2l"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 0) translate(17 24) scale(0.5043808) translate(-24 -24)\">{{part/bolt}}</g><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M26 21.5V18.9996C26 17.8951 25.1046 17 24 17H10C8.89543 17 8 17.8954 8 19V29C8 30.1046 8.89543 31 10 31H24C25.1046 31 26 30.1049 26 29.0003V26.5M26 21.5V26.5M26 21.5H28.5V26.5H26M33.5 24H40M36.5 27.5L40 24L36.5 20.5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>";
+by["status/battery_full_charging"].s="<defs xmlns=\"http://www.w3.org/2000/svg\"><mask id=\"battery-bolt-gap\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g transform=\"translate(0 0) translate(22 24) scale(0.9369098) translate(-24 -24)\" color=\"black\">{{part/bolt}}</g></mask></defs><g xmlns=\"http://www.w3.org/2000/svg\" mask=\"url(#battery-bolt-gap)\"><g style=\"color:var(--success)\">{{part/battery_shell}}</g></g>";
+by["status/battery_mid_charging"].s="<defs xmlns=\"http://www.w3.org/2000/svg\"><mask id=\"battery-bolt-gap\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g transform=\"translate(0 0) translate(22 24) scale(0.9369098) translate(-24 -24)\" color=\"black\">{{part/bolt}}</g></mask></defs><g xmlns=\"http://www.w3.org/2000/svg\" mask=\"url(#battery-bolt-gap)\">{{part/battery_shell:track}}<defs><clipPath id=\"battery-mid-level\"><rect width=\"19.4404\" height=\"48\"/></clipPath></defs><g clip-path=\"url(#battery-mid-level)\" style=\"color:var(--warning)\">{{part/battery_shell}}</g></g>";
+by["drive/rear_camera_detection"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 -1.5)\"><g transform=\"translate(0 11.62) scale(.65)\">{{part/car_side:compact}}</g><defs><mask id=\"rear-camera-gap\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g color=\"black\" stroke=\"black\" stroke-width=\"2.6\"><g transform=\"translate(-1.2555985 1.3555601) translate(26.15 9.6) scale(0.5623166)\">{{part/pedestrian}}</g></g></mask></defs><g mask=\"url(#rear-camera-gap)\"><path d=\"M30.04 27.53A1.9 1.9 0 0 1 30.04 29.59M32.35 26.03A4.65 4.65 0 0 1 32.35 31.09M34.66 24.53A7.4 7.4 0 0 1 34.66 32.59\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" data-optical-stroke=\"1.4\"/></g><g transform=\"translate(-1.2555985 1.3555601) translate(26.15 9.6) scale(0.5623166)\">{{part/pedestrian}}</g></g>";
+// Requested local optical adjustment: these three parking icons gain 8%; the rest keep their sizing.
+for(const n of ['drive/parking_reserved','drive/parking_mechanical','drive/parking_photo']){
+  by[n].s=`<g transform="translate(24 24) scale(1.08) translate(-24 -24)">${by[n].s}</g>`;
+}
 for(const o of ICONS)o.raw=o.s;
 for(const o of ICONS)resolveIcon(o);
 for(const o of ICONS){
@@ -1501,9 +1532,26 @@ function directParts(n){
   return [...new Set(r)];
 }
 // An icon drawn with one component in ink and everything else faint.
+// Partition whole SVG trees while retaining transforms, paint, and mask references.
+// Only the surroundings wrapper gets focus opacity; its child strokes remain opaque.
+function focusLayers(body,part){
+  const root=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${body}</svg>`,'image/svg+xml').documentElement;
+  root.querySelectorAll(`[data-part="${part}"]`).forEach(el=>el.classList.add('hl'));
+  const rest=root.cloneNode(true),ink=root.cloneNode(true);
+  const geometry=new Set(['path','circle','rect','line','ellipse','polyline','polygon','use','text']);
+  function prune(node,selected,inside=false){
+    if(['defs','mask','clipPath'].includes(node.localName))return !selected;
+    const hit=inside||node.getAttribute('data-part')===part;
+    if(geometry.has(node.localName))return hit===selected;
+    for(const child of [...node.children])if(!prune(child,selected,hit))child.remove();
+    if(node.getAttribute('data-part')===part&&selected)node.classList.add('hl');
+    return node===rest||node===ink||node.children.length>0;
+  }
+  prune(rest,false);prune(ink,true);
+  return `<g class="focus-rest">${rest.innerHTML}</g><g class="focus-ink">${ink.innerHTML}</g>`;
+}
 function focusSvg(n,part){
-  const body=inlineSvgBody({s:tagged(n),}).split(`data-part="${part}"`).join(`data-part="${part}" class="hl"`);
-  return `<svg class="ic" viewBox="0 0 48 48" fill="none" data-focus aria-hidden="true">${body}</svg>`;
+  return `<svg class="ic" viewBox="0 0 48 48" fill="none" data-focus aria-hidden="true">${focusLayers(inlineSvgBody({s:tagged(n)}),part)}</svg>`;
 }
 const A='viewBox="0 0 48 48" fill="none"';
 let svgInstance=0;
@@ -1711,8 +1759,7 @@ const anat=$('#anat'),abig=$('#abig'),acap=$('#acap');
 let anatN=null,anatT,anatClear;
 function anatButtons(){trayin.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.p===xPin));}
 function anatFocus(p){
-  abig.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
-  if(p){abig.querySelectorAll(`[data-part="${p}"]`).forEach(x=>x.classList.add('hl'));abig.setAttribute('data-focus','');}
+  if(p&&anatN){abig.innerHTML=focusLayers(inlineSvgBody({s:tagged(anatN)}),p);abig.setAttribute('data-focus','');}
   else abig.removeAttribute('data-focus');
   {const k=p?(partUsage.get(p)||[]).filter(n=>by[n].c!=='part').length:0;acap.innerHTML=p?`${by[p].title}<em>${k} ${k===1?'icon':'icons'}</em>`:(anatN?by[anatN].title:'');}
   const k=p?(partUsage.get(p)||[]).filter(n=>by[n].c!=='part').length:0;
@@ -1762,11 +1809,11 @@ const jsxOut=(o,px)=>{const nm=o.b.split('_').map(w=>w[0].toUpperCase()+w.slice(
   const body=flat(o.s).replace(/\s([a-z]+)-([a-z])([a-z-]*)=/g,(m,a,b,c)=>' '+a+b.toUpperCase()+c.replace(/-([a-z])/g,(x,y)=>y.toUpperCase())+'=').replace(/><(?=[a-z])/g,'>\n      <');
   return `export function ${nm}({ size = ${px}, ...props }) {\n  return (\n    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" {...props}>\n      ${body}\n    </svg>\n  );\n}`;};
 let sel=null;
-function fill(o,keepFocus){
+function fill(o,keepFocus,preserveDrawing=false){
   $('#crumb').textContent=`${CT[o.c].t} / ${o.g}`;
   $('#iname').textContent=o.title;
   $('#ipath').innerHTML=`<span>${o.n}</span>`+RULE(o).map(r=>`<span class="r">${r}</span>`).join('');
-  setBig(o.n,keepFocus);
+  if(!preserveDrawing||big.dataset.n!==o.n)setBig(o.n,keepFocus);
   const asm=$('#part-links'),parts=directParts(o.n);
   const relationPart=o.c==='part'?o.n:o.componentAlias;
   const uses=relationPart?(partUsage.get(relationPart)||[]).filter(n=>by[n].c!=='part'&&n!==o.n):[];
@@ -1907,18 +1954,17 @@ let previewMotion=[];
 function clearPreviewMotion(){previewMotion.forEach(a=>a.cancel());previewMotion=[];stage.querySelectorAll(".preview-ghost").forEach(g=>g.remove());}
 function swapPreview(n,focus){
   clearPreviewMotion();
-  if(lensReduced.matches){setBig(n,focus);return;}
-  const g=ghostOf();g.classList.add("preview-ghost");
   setBig(n,focus);
-  const out=g.animate(softenOut,{duration:90,easing:"linear",fill:"both"});
-  const incoming=big.animate(sharpenIn,{duration:110,delay:90,easing:"ease-out",fill:"both"});
-  previewMotion.push(out,incoming);out.onfinish=()=>{g.remove();out.cancel();};incoming.onfinish=()=>incoming.cancel();
+  if(lensReduced.matches)return;
+  // Browsing does not move the camera. Replace in normal framing, then fade in.
+  const incoming=big.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out',fill:'both'});
+  previewMotion.push(incoming);incoming.onfinish=()=>incoming.cancel();
 }
-function setBig(n,focus){big.setAttribute('fill','none');big.innerHTML=inlineSvgBody({s:tagged(n)});big.dataset.n=n;focusPart(focus);}
+function setBig(n,focus){big.setAttribute('fill','none');big._focusBody=inlineSvgBody({s:tagged(n)});big._focusPart=null;big.innerHTML=big._focusBody;big.dataset.n=n;focusPart(focus);}
 function focusPart(p){
-  big.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
-  if(p){const hit=big.querySelectorAll(`[data-part="${p}"]`);hit.forEach(x=>x.classList.add('hl'));big.toggleAttribute('data-focus',!!hit.length);}
-  else big.removeAttribute('data-focus');
+  if(p&&p!==big._focusPart){big.innerHTML=focusLayers(big._focusBody,p);big._focusPart=p;}
+  const hit=p&&big.querySelector(`[data-part="${p}"].hl`);
+  big.toggleAttribute('data-focus',!!hit);
   asmEl.querySelectorAll('button').forEach(b=>b.classList.toggle('hl',!!p&&b.dataset.rel==='part'&&b.dataset.inspect===p));
   leads.querySelectorAll('g[data-n]').forEach(g=>g.classList.toggle('hl',!!p&&g.dataset.n===p));
 }
@@ -1995,13 +2041,14 @@ function poseFor(el,from,to){
   const fx=(from.l+from.r)/2,fy=(from.t+from.b)/2,tx=(to.l+to.r)/2,ty=(to.t+to.b)/2;
   return [tx-cx-s*(fx-cx),ty-cy-s*(fy-cy),s];
 }
-let morphs=[];
-function clearMorph(){clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>a.cancel());morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
+let morphs=[],morphEpoch=0;
+function afterMotion(animation,callback){const epoch=morphEpoch;animation.onfinish=()=>{if(epoch===morphEpoch)callback();};}
+function clearMorph(){morphEpoch++;clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>{a.onfinish=null;a.cancel();});morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
 function ghostOf(){
   const g=big.cloneNode(true);g.removeAttribute('id');g.classList.add('ghost');
   // Freeze the current highlight once: hover transitions must not compete with exit blur.
-  const source=big.querySelectorAll(GEOM),copy=g.querySelectorAll(GEOM);
-  source.forEach((el,i)=>{if(!el.closest('mask,clipPath,defs'))copy[i].style.opacity=getComputedStyle(el).opacity;});
+  const source=big.querySelectorAll(`${GEOM},.focus-rest`),copy=g.querySelectorAll(`${GEOM},.focus-rest`);
+  source.forEach((el,i)=>{if(!el.closest('mask,clipPath,defs')){copy[i].style.opacity=getComputedStyle(el).opacity;copy[i].style.transition='none';}});
   g.removeAttribute('data-focus');g.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));
   stage.append(g);return g;
 }
@@ -2034,7 +2081,7 @@ function moveLabelArrow(el,previous,target,scale){
     const move=motion(g,[{transform:'none'},{transform:`translate(${target.left-previous.rect.left}px,${target.top-previous.rect.top}px) scale(${1/scale})`}],TEXT_MS,0,TEXT_EASE);
     const fade=motion(g,[{opacity},{opacity:0}],80,0,TEXT_EASE);
     fade.onfinish=()=>{};
-    move.onfinish=()=>{g.remove();move.cancel();fade.cancel();};
+    afterMotion(move,()=>{g.remove();move.cancel();fade.cancel();});
   }
 }
 function moveLabels(before,still){
@@ -2081,18 +2128,38 @@ function partPaintKinds(roots){
 // Soften while still legible, then disappear before the replacement starts moving.
 const softenOut=[{offset:0,opacity:1,filter:"blur(0px)"},{offset:.35,opacity:.92,filter:"blur(2px)"},{offset:1,opacity:0,filter:"blur(4px)"}];
 const sharpenIn=[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0px)"}];
-function movablePart(svgEl,part){
-  const hits=svgEl.querySelectorAll(`[data-part="${part}"]`);
-  // Repeated or masked shapes have no single complete source to move from.
-  return hits.length===1&&!hits[0].closest('[clip-path],[mask]');
+function principalPart(svgEl,part){
+  const hits=[...svgEl.querySelectorAll(`[data-part="${part}"]`)];
+  // Choose one visible instance. Never centre a camera between repeated marks.
+  const weight=g=>{
+    let ink=0;
+    for(const el of g.querySelectorAll(GEOM)){
+      if(el.closest('defs,mask,clipPath'))continue;
+      const style=getComputedStyle(el),m=el.getScreenCTM(),b=el.getBBox();
+      let opacity=1;for(let e=el;e&&e!==svgEl;e=e.parentElement)opacity*=+getComputedStyle(e).opacity;
+      if(style.visibility==='hidden'||!m)continue;
+      const area=Math.abs(m.a*m.d-m.b*m.c);
+      ink+=opacity*area*(style.fill!=='none'?b.width*b.height:el.getTotalLength()*parseFloat(style.strokeWidth));
+    }return ink;
+  };
+  return hits.map((el,index)=>({el,index,weight:weight(el)}))
+    .filter(x=>x.weight>0&&!x.el.closest('defs,clipPath,mask,[clip-path],[mask]'))
+    .sort((a,b)=>b.weight-a.weight||a.index-b.index)[0]||null;
+}
+function movablePart(svgEl,part){return !!principalPart(svgEl,part);}
+function sameOrientation(source,target){
+  const element=root=>root.matches?.(GEOM)?root:[...root.querySelectorAll(GEOM)].find(e=>!e.closest('defs,mask,clipPath'));
+  const a=element(source)?.getScreenCTM(),b=element(target)?.getScreenCTM();if(!a||!b)return false;
+  const norm=m=>{const x=Math.hypot(m.a,m.b),y=Math.hypot(m.c,m.d);return [m.a/x,m.b/x,m.c/y,m.d/y];};
+  const x=norm(a),y=norm(b);return x.every((v,i)=>Math.abs(v-y[i])<.015);
 }
 function blendBig(o,still){
   const g=still?null:ghostOf();fill(o);
-  if(g){const fade=motion(g,softenOut,100,0,"linear");fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);}
+  if(g){const fade=motion(g,softenOut,100,0,"linear");afterMotion(fade,()=>{g.remove();fade.cancel();});motion(big,sharpenIn,180,100);}
 }
 function go(n,{back=false,instant=false}={}){
   if(!by[n]||n===sel||lensState!=='open')return;
-  const labels=captureLabels();
+  const labels=captureLabels(),previewOpacity=preview===n?+getComputedStyle(big).opacity:1;
   // Save the visible component position before cancelling an interrupted movement.
   const visiblePart=by[big.dataset.n]?.c==='part'?rectOf(drawn(big)):null;
   clearMorph();stopExtract();clearTimeout(previewT);hoverLock=true;hovered=null;
@@ -2100,8 +2167,9 @@ function go(n,{back=false,instant=false}={}){
   if(!back)trail.push(from);
   if(preview===n){
     const keep=by[sel].componentAlias||sel;preview=null;say('');
-    sel=n;markTile(selectedTile(n));fill(by[n],keep);
-    requestAnimationFrame(()=>{if(sel===n)focusPart(null);});
+    sel=n;markTile(selectedTile(n));fill(by[n],keep,true);
+    if(!still&&previewOpacity<1)motion(big,[{opacity:previewOpacity},{opacity:1}],180*(1-previewOpacity),0,'ease-out');
+    const epoch=morphEpoch;requestAnimationFrame(()=>{if(epoch===morphEpoch&&sel===n)focusPart(null);});
     updateBack();layoutLeads();moveLabels(labels,still);return;
   }
   if(preview){preview=null;setBig(from);}
@@ -2109,31 +2177,31 @@ function go(n,{back=false,instant=false}={}){
   sel=n;markTile(selectedTile(n));
   const showing=big.dataset.n,showingPart=by[showing]?.componentAlias||(by[showing]?.c==='part'?showing:null);
   if(!still&&by[n].c==='part'&&movablePart(big,n)){
-    const source=big.querySelectorAll(`[data-part="${n}"]`),a=rectOf(source),paints=partPaintKinds(source);
+    const principal=principalPart(big,n),source=[principal.el],a=rectOf(source),paints=partPaintKinds(source);
     const g=ghostOf();
     fill(by[n]);const b=rectOf(drawn(big));
-    if(a&&b&&paints===partPaintKinds(drawn(big))){
-      g.querySelectorAll(`[data-part="${n}"]`).forEach(x=>x.remove());
+    if(a&&b&&paints===partPaintKinds(drawn(big))&&sameOrientation(g.querySelectorAll(`[data-part="${n}"]`)[principal.index],big)){
+      g.querySelectorAll(`[data-part="${n}"]`)[principal.index].remove();
       // Clear the surrounding strokes before the only visible part starts moving.
       cam(big,poseFor(big,b,a),[0,0,1],200,100);
       const fade=motion(g,softenOut,100,0,"linear");
-      fade.onfinish=()=>{g.remove();fade.cancel();};
+      afterMotion(fade,()=>{g.remove();fade.cancel();});
     }else{
-      // Solid and outlined variants have different silhouettes; do not swap one mid-zoom.
-      const fade=motion(g,softenOut,100,0,'linear');fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,100,100);
+      // Different silhouettes or orientations use a stationary transition, with no mid-zoom shape swap.
+      const fade=motion(g,softenOut,100,0,'linear');afterMotion(fade,()=>{g.remove();fade.cancel();});motion(big,sharpenIn,100,100);
     }
   }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
     const a=visiblePart||rectOf(drawn(big)),g=ghostOf();
-    fill(by[n]);const holds=big.querySelectorAll(`[data-part="${showingPart}"]`),b=rectOf(holds);
-    if(a&&b&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)){
+    fill(by[n]);const principal=principalPart(big,showingPart),holds=principal?[principal.el]:[],b=rectOf(holds);
+    if(a&&b&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)&&sameOrientation(g,holds[0])){
       holds.forEach(x=>x.classList.add('hold'));
       const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),200);
       // Keep the arrived part visible while its surrounding strokes sharpen back in.
       move.onfinish=()=>{};
       const reveal=motion(big,sharpenIn,100,200);
-      reveal.onfinish=()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();reveal.cancel();};
+      afterMotion(reveal,()=>{g.remove();holds.forEach(x=>x.classList.remove('hold'));move.cancel();reveal.cancel();});
     }else{
-      const fade=motion(g,softenOut,100,0,"linear");fade.onfinish=()=>{g.remove();fade.cancel();};motion(big,sharpenIn,180,100);
+      const fade=motion(g,softenOut,100,0,"linear");afterMotion(fade,()=>{g.remove();fade.cancel();});motion(big,sharpenIn,180,100);
     }
   }else{
     blendBig(by[n],still);
