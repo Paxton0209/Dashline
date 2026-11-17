@@ -1616,6 +1616,33 @@ const tbtCenterOffsets={
 for(const [n,[dx,dy]] of Object.entries(tbtCenterOffsets))by[n].s=`<g transform="translate(${dx} ${dy})">${by[n].s}</g>`;
 // Optical placement only: retain the full size of wide driver-assistance artwork.
 for(const [n,dx] of Object.entries({"drive/forward_collision_warning":-1.25,"drive/rear_camera_detection":1.75}))by[n].s=`<g transform="translate(${dx} 0)">${by[n].s}</g>`;
+// The standalone drawing uses the largest matching production instance as its
+// reference size. Undo that normalization at each unvaried use so assembled
+// icons retain their reviewed geometry, including optical placement and scale.
+const partReferenceScale={
+  'part/transfer_tray':1.075,'part/speaker':1.075,'part/speaker_wave':1.075,
+  'part/repeat_arrows':1.075,'part/media_badge_frame':1.02125,
+  'part/badge_check':1.075,'part/badge_ban':1.075,
+  'part/parking_letter':1.0152,'part/parking_corners':1.08,
+  'part/weather_cloud':1.11,'part/z':1.11,'part/video_camera':1.11,
+  'part/steering_wheel':1.02125,'part/toll_currency':1.1,
+  'part/signal_arc':1.705,'part/lock_shackle':7/6
+};
+const scalePart=(body,s)=>`<g transform="translate(24 24) scale(${s}) translate(-24 -24)">${body}</g>`;
+// Transfer tray has the same -1.5 px optical offset in both upload/download.
+// Preserve its position as well as its size when it becomes standalone.
+const partReferenceOffset={'part/transfer_tray':[0,-1.5]};
+function referencePart(body,n,inverse=false){
+  const s=partReferenceScale[n],offset=partReferenceOffset[n];
+  if(!offset)return scalePart(body,inverse?1/s:s);
+  const [x,y]=offset;
+  return inverse?scalePart(`<g transform="translate(${-x} ${-y})">${body}</g>`,1/s):
+    `<g transform="translate(${x} ${y})">${scalePart(body,s)}</g>`;
+}
+const retainPartSize=body=>body.replace(/\{\{(part\/\w+)\}\}/g,(ref,n)=>partReferenceScale[n]?referencePart(ref,n,true):ref);
+for(const o of ICONS)o.s=retainPartSize(o.s);
+for(const key of Object.keys(partVariants))partVariants[key]=retainPartSize(partVariants[key]);
+for(const n of Object.keys(partReferenceScale))by[n].s=referencePart(by[n].s,n);
 for(const o of ICONS)o.raw=o.s;
 for(const o of ICONS)resolveIcon(o);
 for(const o of ICONS){
@@ -2162,14 +2189,22 @@ function scheduleLeads(){clearTimeout(leadsT);layoutLeads();}
 asmEl.addEventListener('scroll',()=>asmEl.classList.toggle('end',asmEl.scrollTop+asmEl.clientHeight>=asmEl.scrollHeight-2),{passive:true});
 function rectOf(els){
   let r=null;
-  for(const el of els){const b=el.getBoundingClientRect();if(!b.width&&!b.height)continue;
-    r=r?{l:Math.min(r.l,b.left),t:Math.min(r.t,b.top),r:Math.max(r.r,b.right),b:Math.max(r.b,b.bottom)}:{l:b.left,t:b.top,r:b.right,b:b.bottom};}
+  // Measure geometry independently of stroke animation. Firefox includes stroke
+  // overflow in some DOM client rects, making the measured box change mid-zoom.
+  for(const el of els){const b=el.getBBox(),m=el.getScreenCTM();if(!m||(!b.width&&!b.height))continue;
+    const pts=[[b.x,b.y],[b.x+b.width,b.y],[b.x,b.y+b.height],[b.x+b.width,b.y+b.height]].map(([x,y])=>new DOMPoint(x,y).matrixTransform(m));
+    const box={l:Math.min(...pts.map(p=>p.x)),t:Math.min(...pts.map(p=>p.y)),r:Math.max(...pts.map(p=>p.x)),b:Math.max(...pts.map(p=>p.y))};
+    r=r?{l:Math.min(r.l,box.l),t:Math.min(r.t,box.t),r:Math.max(r.r,box.r),b:Math.max(r.b,box.b)}:box;}
   return r;
 }
 const drawn=svgEl=>[...svgEl.children].filter(c=>c.localName!=='defs');
 function poseFor(el,from,to){
   const box=el.getBoundingClientRect(),cx=box.left+box.width/2,cy=box.top+box.height/2;
-  const s=Math.min((to.r-to.l)/Math.max(.01,from.r-from.l),(to.b-to.t)/Math.max(.01,from.b-from.t));
+  // A vertical/horizontal stroke has a zero-width/height geometry box. Its
+  // nonzero axis defines the zoom; including the empty axis collapses it.
+  const ratios=[[from.r-from.l,to.r-to.l],[from.b-from.t,to.b-to.t]]
+    .filter(([a,b])=>a>.01&&b>.01).map(([a,b])=>b/a);
+  const s=ratios.length?Math.min(...ratios):1;
   const fx=(from.l+from.r)/2,fy=(from.t+from.b)/2,tx=(to.l+to.r)/2,ty=(to.t+to.b)/2;
   return [tx-cx-s*(fx-cx),ty-cy-s*(fy-cy),s];
 }
@@ -2285,6 +2320,12 @@ function sameOrientation(source,target){
   const norm=m=>{const x=Math.hypot(m.a,m.b),y=Math.hypot(m.c,m.d);return [m.a/x,m.b/x,m.c/y,m.d/y];};
   const x=norm(a),y=norm(b);return x.every((v,i)=>Math.abs(v-y[i])<.015);
 }
+function sameAspect(a,b){
+  const ax=a.r-a.l,ay=a.b-a.t,bx=b.r-b.l,by=b.b-b.t;
+  if(ax<.01||bx<.01)return ax<.01&&bx<.01&&ay>.01&&by>.01;
+  if(ay<.01||by<.01)return ay<.01&&by<.01;
+  return Math.abs((ax/ay)/(bx/by)-1)<.002;
+}
 function blendBig(o,still){
   const g=still?null:ghostOf();fill(o);
   if(g){const fade=motion(g,softenOut,100,0,"linear");afterMotion(fade,()=>{g.remove();fade.cancel();});motion(big,sharpenIn,180,100);}
@@ -2312,7 +2353,7 @@ function go(n,{back=false,instant=false}={}){
     const principal=principalPart(big,n),source=[principal.el],a=rectOf(source),paints=partPaintKinds(source);
     const g=ghostOf();
     fill(by[n]);const b=rectOf(drawn(big));
-    if(a&&b&&paints===partPaintKinds(drawn(big))&&sameOrientation(g.querySelectorAll(`[data-part="${n}"]`)[principal.index],big)){
+    if(a&&b&&sameAspect(a,b)&&paints===partPaintKinds(drawn(big))&&sameOrientation(g.querySelectorAll(`[data-part="${n}"]`)[principal.index],big)){
       g.querySelectorAll(`[data-part="${n}"]`)[principal.index].remove();
       // Clear the surrounding strokes before the only visible part starts moving.
       cam(big,poseFor(big,b,a),[0,0,1],200,100);
@@ -2325,7 +2366,7 @@ function go(n,{back=false,instant=false}={}){
   }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
     const a=visiblePart||rectOf(drawn(big)),g=ghostOf();
     fill(by[n]);const principal=principalPart(big,showingPart),holds=principal?[principal.el]:[],b=rectOf(holds);
-    if(a&&b&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)&&sameOrientation(g,holds[0])){
+    if(a&&b&&sameAspect(a,b)&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)&&sameOrientation(g,holds[0])){
       holds.forEach(x=>x.classList.add('hold'));
       const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),200);
       // Keep the arrived part visible while its surrounding strokes sharpen back in.
