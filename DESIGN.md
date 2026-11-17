@@ -104,6 +104,9 @@ Add、Info、Alert、Help、Check circle、Clock、Warning、Toll fee 的圆环�
 
 进入和返回均核对方向、填充方式和长宽比；长宽比相差超过 0.2% 的变体采用先退出再淡入，禁止强行用较短边拟合而瞬间变形。水平、垂直线的缩放只用非零几何轴计算，禁止将零宽或零高当作零倍缩放。验收覆盖所有直接部件关系的首帧位置、过程尺寸和返回衔接。
 
+**5.11 单人图标共用乘员位置。**
+Airbag system warning、Passenger airbag off 与五个单人气流模式均以 `translate(5.1 2)` 放置 Climate occupant，头部和身体的位置、大小一致。语义颜色及附加符号保留各自定义；Rear AC manual 的双人组合沿用单独布局。
+
 ## 6. 待提升为 PDS 通用规则的候选
 
 以下几条不只适用于 Dashline，建议讨论后并入 Paxton Design System：2.1、2.4、3.1、3.3、5.2、5.3、5.5。
