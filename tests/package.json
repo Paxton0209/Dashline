@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node inspector-geometry.cjs && node inspector-interactions.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

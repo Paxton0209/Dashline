@@ -362,16 +362,13 @@ svg.ic :is(path,circle,rect,line,ellipse,polyline,polygon):not(mask *,clipPath *
 .sr .iph .crumb{visibility:hidden}
 .asm{position:relative;flex:1;min-height:0;margin-top:24px}
 .asm[data-kind=parts] button{position:absolute;left:0;top:0;width:56px;height:56px}
-.asm[data-kind=uses]{display:grid;grid-template-columns:repeat(auto-fill,48px);gap:8px;align-content:center;overflow:auto;scrollbar-width:none;padding:2px}
 .asm::-webkit-scrollbar{display:none}
 .asm button{display:grid;place-items:center;border-radius:var(--ds-radius-control);background:var(--fill);color:var(--icon);transition:background-color .12s;corner-shape:superellipse(1.6)}
-.asm[data-kind=uses] button{width:48px;height:48px}
 :root:not([data-theme=dark]) .asm button{background:#f4f4f3}
 .asm button:hover,.asm button.hl{background:var(--fill2)}
 :root:not([data-theme=dark]) .asm button:hover,:root:not([data-theme=dark]) .asm button.hl{background:#ebebea}
 .asm button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .asm[data-kind=parts] .ic{width:36px;height:36px}
-.asm[data-kind=uses] .ic{width:32px;height:32px}
 .iph .back{display:none;align-items:center;gap:2px;height:32px;margin-left:-8px;padding:0 10px 0 4px;border-radius:var(--ds-radius-control);font:var(--t-cap);color:var(--t2);max-width:100%;transition:background-color .12s,color .12s;corner-shape:superellipse(1.6)}
 .iph .back:hover{background:var(--fill);color:var(--ink)}
 .iph .back svg{width:18px;height:18px;flex:none}
@@ -461,9 +458,6 @@ body.leading .stage .keys>g{opacity:1}
 .asm .sizes button{background:none!important}
 
 /* tiles take the space they are given: largest size that fits every icon */
-.asm[data-kind=uses]{--s:48px;grid-template-columns:repeat(auto-fill,var(--s));gap:10px;align-content:center;justify-content:start}
-.asm[data-kind=uses] button{width:var(--s);height:var(--s)}
-.asm[data-kind=uses] .ic{width:calc(var(--s) * .6);height:calc(var(--s) * .6)}
 
 /* ---- mini map: shape only, no words ---- */
 .acap{display:none}
@@ -483,7 +477,6 @@ body.leading .stage .keys>g{opacity:1}
 .sheet>.back svg{width:20px;height:20px;flex:none}
 .sheet.trail>.back{display:flex}
 .ihead{margin-top:44px}
-.asm[data-kind=uses]{align-content:safe center}
 
 /* one rule for both dialogs: tiles start under the title, explicit column count, as large as fits */
 .asm[data-kind]{display:grid;--s:48px;--cols:4;grid-template-columns:repeat(var(--cols),var(--s));gap:10px;align-content:start;justify-content:start;overflow:auto;padding:2px;margin-top:20px}
@@ -621,7 +614,7 @@ body.leading .stage .keys>g{opacity:1}
     </div>
     <div class="ihead"><div class="iname" id="iname" tabindex="-1"></div><div class="ipath" id="ipath"></div></div>
     <svg class="tree" id="tree" aria-hidden="true"></svg>
-    <section class="asm" id="part-links" aria-label="Component relationships" hidden></section>
+    <section class="asm" id="part-links" aria-label="Component parts" hidden></section>
     <div class="acts2">
       <button class="bt pri" id="cSvg" type="button" aria-label="Copy SVG">
         <span class="svg-copy-idle" aria-hidden="true">Copy SVG</span>
@@ -651,8 +644,8 @@ const ICONS=[
   {"n":"general/open","c":"general","s":"<g transform=\"translate(24.0000 24.0000) scale(0.960000) translate(-24.0000 -24.0000)\"><path d=\"M13.875 12H34.125C35.1607 12 36 12.8392 36 13.875V34.125C36 35.1607 35.1607 36 34.125 36H13.875C12.8392 36 12 35.1607 12 34.125V13.875C12 12.8392 12.8392 12 13.875 12Z\" stroke-width=\"2.083333\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M19.0445 19.8817L22.9596 23.4054A0.8 0.8 0 0 1 22.9596 24.5946L19.0445 28.1183A1 1 0 0 1 17.7065 26.6317L20.6307 24L17.7065 21.3683A1 1 0 0 1 19.0445 19.8817Z\" fill=\"currentColor\"/><g transform=\"translate(7.5 0)\"><path d=\"M19.0445 19.8817L22.9596 23.4054A0.8 0.8 0 0 1 22.9596 24.5946L19.0445 28.1183A1 1 0 0 1 17.7065 26.6317L20.6307 24L17.7065 21.3683A1 1 0 0 1 19.0445 19.8817Z\" fill=\"currentColor\"/></g></g>","g":"Actions"},
   {"n":"general/expand","c":"general","s":"<path d=\"M26.9333 12.9999H35V21.0665M35 12.9999L26.2 21.7999M21.0666 34.9998H13V26.9332M13 34.9998L21.8 26.1999\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Actions"},
   {"n":"general/collapse_fullscreen","c":"general","s":"<path d=\"M12 18.68H18.68V12M29.08 12V18.68H35.76M12 29.08H18.68V35.76M29.08 35.76V29.08H35.76\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Actions"},
-  {"n":"general/swap","c":"general","s":"{{part/direction_arrow:swap}}","g":"Actions"},
-  {"n":"general/sort","c":"general","s":"{{part/direction_arrow:sort}}","g":"Actions"},
+  {"n":"general/swap","c":"general","s":"{{part/direction_arrow:swap_right}}{{part/direction_arrow:swap_left}}","g":"Actions"},
+  {"n":"general/sort","c":"general","s":"<g transform=\"rotate(90 24 24)\">{{part/direction_arrow:swap_right}}{{part/direction_arrow:swap_left}}</g>","g":"Actions"},
   {"n":"general/filter","c":"general","s":"<g transform=\"translate(24.0000 24.0000) scale(1.100000) translate(-24.0000 -24.0000)\"><path d=\"M21 25.2399V32.573C21 33.6881 22.1735 34.4133 23.1709 33.9147L25.8945 32.5529C26.5721 32.2141 27.0001 31.5215 27.0001 30.764V25.2399C27.0001 24.7625 27.1708 24.3008 27.4815 23.9383L33.8776 16.4762C34.7117 15.5032 34.0203 14 32.7388 14H15.2613C13.9798 14 13.2884 15.5032 14.1224 16.4762L20.5185 23.9383C20.8293 24.3008 21 24.7625 21 25.2399Z\" stroke-width=\"1.818182\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>","g":"Actions"},
   {"n":"general/search","c":"general","s":"<path d=\"M36.5121 36.5123L27.8586 27.8587M27.8586 27.8587C26.0714 29.6459 23.6025 30.7514 20.8756 30.7514C15.4218 30.7514 11 26.3296 11 20.8757C11 15.4219 15.4218 11.0001 20.8756 11.0001C26.3294 11.0001 30.7512 15.4219 30.7512 20.8757C30.7512 23.6027 29.6458 26.0716 27.8586 27.8587Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Actions"},
   {"n":"general/menu","c":"general","s":"<path d=\"M13 16H35.0002M13 24.0667H35.0002M13 32.1335H35.0002\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Actions"},
@@ -1346,7 +1339,6 @@ function skipTriangle({left=false,solid=false}={}){
   return left?`<g transform="translate(48 0) scale(-1 1)">${next}</g>`:next;
 }
 const transferArrow=straightArrow(23.75,17.5,21.5,5);
-const swapArrows=`${transferArrow}<g transform="rotate(180 24 24)">${transferArrow}</g>`;
 const compactDirectionArrow=straightArrow(24,24,23,6.5);
 by['part/direction_arrow'].s=compactDirectionArrow;
 by['part/curved_airflow_arrow'].s=curvedAirflowArrow('M11 32V31Q11 20.5 25 20.5H32',20.5);
@@ -1388,8 +1380,8 @@ const partVariants={
   'part/direction_arrow:left':`<g transform="translate(48 0) scale(-1 1)">${compactDirectionArrow}</g>`,
   'part/direction_arrow:right':compactDirectionArrow,
   'part/direction_arrow:airflow':straightArrow(20.5,24,23,6.5),
-  'part/direction_arrow:swap':swapArrows,
-  'part/direction_arrow:sort':`<g transform="rotate(90 24 24)">${swapArrows}</g>`,
+  'part/direction_arrow:swap_right':transferArrow,
+  'part/direction_arrow:swap_left':`<g transform="rotate(180 24 24)">${transferArrow}</g>`,
   'part/direction_arrow:adjust_seat':straightArrow(29.2,20.8,13.6,3.1,{double:true}),
   'part/direction_arrow:adjust_steering':straightArrow(34.8,24.315,17.83,2.43,{double:true,angle:90}),
   'part/direction_arrow:adjust_window':straightArrow(36.25,24,18.7,2.85,{double:true,angle:90}),
@@ -1433,14 +1425,22 @@ const partVariants={
   'part/car_side:compact':compactCar('part/car_side'),
   'part/car_front:compact':compactCar('part/car_front')
 };
+// Expose both arrows of a compound direction symbol without changing artwork.
+const repeatPaths=by['part/repeat_arrows'].s.match(/<path\b[^>]*\/>/g);
+partVariants['part/direction_arrow:repeat_out']=repeatPaths[0];
+partVariants['part/direction_arrow:repeat_back']=repeatPaths[1];
+by['part/repeat_arrows'].s='{{part/direction_arrow:repeat_out}}{{part/direction_arrow:repeat_back}}';
+for(const name of ['upload','download']){
+  const icon=by['general/'+name],arrow=icon.s.match(/<path\b[^>]*\/>/)[0];
+  partVariants['part/direction_arrow:'+name]=arrow;
+  icon.s=icon.s.replace(arrow,'{{part/direction_arrow:'+name+'}}');
+}
 const partUsage=new Map(ICONS.filter(o=>o.c==='part').map(o=>[o.n,[]]));
 const resolving=new Set();
 function resolveIcon(o){
   if(o.parts)return o.s;
   if(resolving.has(o.n))throw new Error(`Circular icon component reference: ${o.n}`);
   resolving.add(o.n);
-  const direct=o.s.replace(/<\/?g\b[^>]*>/g,'').trim().match(/^\{\{(part\/\w+)(:\w+)?\}\}$/);
-  o.componentAlias=o.c!=='part'&&!o.off&&direct?direct[1]:null;
   const refs=new Set();
   function use(part,variant){
     const icon=by[part];
@@ -1684,20 +1684,74 @@ function directParts(n){
   if(o.off)r.push('part/off_slash');
   return [...new Set(r)];
 }
+// Inspector relationships always descend into the actual assembly. A reference
+// to the whole drawing is transparent; a terminal symbol has no child cards.
+const inspections=new Map();
+const inspectionTitles={
+  'general/swap':['Right arrow','Left arrow'],
+  'general/sort':['Down arrow','Up arrow'],
+  'general/upload':['Up arrow','Transfer tray'],
+  'general/download':['Down arrow','Transfer tray'],
+  'media/pause':['Left pause bar','Right pause bar'],
+  'media/pause_fill':['Left pause bar','Right pause bar']
+};
+let inspectionSerial=0;
+const partSelector=p=>by[p]?.originPart?`[data-instance="${p}"]`:`[data-part="${p}"]`;
+function inspection(n){
+  if(inspections.has(n))return inspections.get(n);
+  const root=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${tagged(n)}</svg>`,'image/svg+xml').documentElement;
+  const visible=e=>!e.closest('defs,mask,clipPath');
+  const outer=()=>[...root.querySelectorAll('[data-part]')].filter(e=>visible(e)&&!e.parentElement.closest('[data-part]'));
+  const ink=[...root.querySelectorAll('path,circle,rect,line,ellipse,polyline,polygon,use,text')].filter(visible);
+  let nodes=outer();
+  while(nodes.length===1&&ink.length&&ink.every(e=>nodes[0].contains(e))){
+    nodes[0].removeAttribute('data-part');nodes[0].removeAttribute('data-instance');nodes=outer();
+  }
+  const geometryKeys=new Map(),entries=[];
+  nodes.forEach((node,index)=>{
+    const part=node.getAttribute('data-part'),id=`instance/${++inspectionSerial}`;
+    node.setAttribute('data-instance',id);
+    // Clone the selected branch with ancestor transforms and paint.
+    // Definitions stay available, but other visible geometry never enters a card.
+    const copy=root.cloneNode(true),selected=copy.querySelector(`[data-instance="${id}"]`);
+    function keep(e){
+      if(e===selected||['defs','mask','clipPath'].includes(e.localName))return true;
+      if(!e.contains(selected))return false;
+      for(const child of [...e.children])if(!keep(child))child.remove();
+      return true;
+    }
+    keep(copy);
+    const contextClipped=!!node.parentElement.closest('[mask],[clip-path]');
+    for(let e=selected.parentElement;e&&e!==copy;e=e.parentElement){e.removeAttribute('mask');e.removeAttribute('clip-path');}
+    selected.removeAttribute('data-part');selected.removeAttribute('data-instance');
+    const body=copy.innerHTML;
+    // Track/fill layers at the same location are one semantic part. Distinct
+    // repeated positions (two arrows, pause bars, occupants) remain separate.
+    const signature=copy.cloneNode(true);
+    signature.querySelectorAll('defs').forEach(e=>e.remove());
+    signature.querySelectorAll('*').forEach(e=>{for(const a of [...e.attributes])if(/^(xmlns|id|data-instance|opacity|fill-opacity|stroke-opacity|style|color)$/.test(a.name))e.removeAttribute(a.name);});
+    const key=part+signature.innerHTML,prior=geometryKeys.get(key);
+    const target=prior||id;
+    node.setAttribute('data-instance',target);
+    by[target]={...by[part],n:target,title:inspectionTitles[n]?.[index]||by[part].title,s:body,raw:body,originPart:part,contextClipped:contextClipped||!!prior};TAG[target]=body;
+    if(!prior){geometryKeys.set(key,id);entries.push(id);}
+  });
+  const result={body:root.innerHTML,entries};inspections.set(n,result);return result;
+}
 // An icon drawn with one component in ink and everything else faint.
 // Partition whole SVG trees while retaining transforms, paint, and mask references.
 // Only the surroundings wrapper gets focus opacity; its child strokes remain opaque.
 function focusLayers(body,part){
   const root=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${body}</svg>`,'image/svg+xml').documentElement;
-  root.querySelectorAll(`[data-part="${part}"]`).forEach(el=>el.classList.add('hl'));
+  root.querySelectorAll(partSelector(part)).forEach(el=>el.classList.add('hl'));
   const rest=root.cloneNode(true),ink=root.cloneNode(true);
   const geometry=new Set(['path','circle','rect','line','ellipse','polyline','polygon','use','text']);
   function prune(node,selected,inside=false){
     if(['defs','mask','clipPath'].includes(node.localName))return !selected;
-    const hit=inside||node.getAttribute('data-part')===part;
+    const hit=inside||node.matches?.(partSelector(part));
     if(geometry.has(node.localName))return hit===selected;
     for(const child of [...node.children])if(!prune(child,selected,hit))child.remove();
-    if(node.getAttribute('data-part')===part&&selected)node.classList.add('hl');
+    if(node.matches?.(partSelector(part))&&selected)node.classList.add('hl');
     return node===rest||node===ink||node.children.length>0;
   }
   prune(rest,false);prune(ink,true);
@@ -1863,7 +1917,15 @@ function normBox(n){
   const cx=b.x+b.width/2,cy=b.y+b.height/2;
   return NORM[n]=`${(cx-side/2).toFixed(2)} ${(cy-side/2).toFixed(2)} ${side.toFixed(2)} ${side.toFixed(2)}`;
 }
-const partSvg=n=>`<svg class="pc" viewBox="${normBox(n)}" fill="none" aria-hidden="true">${inlineSvgBody(by[n])}</svg>`;
+const partCards=new Map();
+function partSvg(n){
+  if(!partCards.has(n)){
+    const [x,y,side]=normBox(n).split(' ').map(Number),scale=40/side;
+    const card={s:`<g transform="translate(24 24) scale(${scale}) translate(${-x-side/2} ${-y-side/2})">${by[n].s}</g>`};
+    normalizeIconStrokes(card);partCards.set(n,card.s);
+  }
+  return `<svg class="pc" viewBox="0 0 48 48" fill="none" aria-hidden="true">${inlineSvgBody({s:partCards.get(n)})}</svg>`;
+}
 /* ---- X-ray ---- */
 const tray=$('#anat'),trayin=$('#trayin'),tcap=$('#tcap'),xr=$('#xr');
 trayin.innerHTML='';
@@ -1967,17 +2029,13 @@ function fill(o,keepFocus,preserveDrawing=false){
   $('#iname').textContent=o.title;
   $('#ipath').innerHTML=`<span>${o.n}</span>`+RULE(o).map(r=>`<span class="r">${r}</span>`).join('');
   if(!preserveDrawing||big.dataset.n!==o.n)setBig(o.n,keepFocus);
-  const asm=$('#part-links'),parts=directParts(o.n);
-  const relationPart=o.c==='part'?o.n:o.componentAlias;
-  const uses=relationPart?(partUsage.get(relationPart)||[]).filter(n=>by[n].c!=='part'&&n!==o.n):[];
+  const asm=$('#part-links'),names=inspection(o.n).entries;
   asm.replaceChildren();leads.replaceChildren();
-  const kind=relationPart?'uses':'parts';
-  const names=kind==='uses'?uses:parts;
-  asm.dataset.kind=kind;
+  asm.dataset.kind='parts';
   asm.append(...names.map(n=>{
-    const b=document.createElement('button');b.type='button';b.dataset.inspect=n;b.dataset.rel=kind==='uses'?'use':'part';
+    const b=document.createElement('button');b.type='button';b.dataset.inspect=n;b.dataset.rel='part';
     b.setAttribute('aria-label',by[n].title);
-    b.innerHTML=kind==='uses'?focusSvg(n,relationPart):partSvg(n);
+    b.innerHTML=partSvg(n);
     return b;
   }));
   asm.hidden=!names.length;
@@ -2119,10 +2177,10 @@ function swapPreview(n,focus){
   const incoming=big.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out',fill:'both'});
   previewMotion.push(incoming);incoming.onfinish=()=>incoming.cancel();
 }
-function setBig(n,focus){big.setAttribute('fill','none');big._focusBody=inlineSvgBody({s:tagged(n)});big._focusPart=null;big.innerHTML=big._focusBody;big.dataset.n=n;focusPart(focus);}
+function setBig(n,focus){big.setAttribute('fill','none');big._focusBody=inlineSvgBody({s:inspection(n).body});big._focusPart=null;big.innerHTML=big._focusBody;big.dataset.n=n;focusPart(focus);}
 function focusPart(p){
   if(p&&p!==big._focusPart){big.innerHTML=focusLayers(big._focusBody,p);big._focusPart=p;}
-  const hit=p&&big.querySelector(`[data-part="${p}"].hl`);
+  const hit=p&&big.querySelector(`${partSelector(p)}.hl`);
   big.toggleAttribute('data-focus',!!hit);
   asmEl.querySelectorAll('button').forEach(b=>b.classList.toggle('hl',!!p&&b.dataset.rel==='part'&&b.dataset.inspect===p));
   leads.querySelectorAll('g[data-n]').forEach(g=>g.classList.toggle('hl',!!p&&g.dataset.n===p));
@@ -2296,7 +2354,7 @@ function partPaintKinds(roots){
 const softenOut=[{offset:0,opacity:1,filter:"blur(0px)"},{offset:.35,opacity:.92,filter:"blur(2px)"},{offset:1,opacity:0,filter:"blur(4px)"}];
 const sharpenIn=[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0px)"}];
 function principalPart(svgEl,part){
-  const hits=[...svgEl.querySelectorAll(`[data-part="${part}"]`)];
+  const hits=[...svgEl.querySelectorAll(partSelector(part))];
   // Choose one visible instance. Never centre a camera between repeated marks.
   const weight=g=>{
     let ink=0;
@@ -2310,7 +2368,7 @@ function principalPart(svgEl,part){
     }return ink;
   };
   return hits.map((el,index)=>({el,index,weight:weight(el)}))
-    .filter(x=>x.weight>0&&!x.el.closest('defs,clipPath,mask,[clip-path],[mask]'))
+    .filter(x=>x.weight>0&&!x.el.closest('defs,clipPath,mask')&&(by[part]?.originPart||!x.el.closest('[clip-path],[mask]')))
     .sort((a,b)=>b.weight-a.weight||a.index-b.index)[0]||null;
 }
 function movablePart(svgEl,part){return !!principalPart(svgEl,part);}
@@ -2332,43 +2390,36 @@ function blendBig(o,still){
 }
 function go(n,{back=false,instant=false}={}){
   if(!by[n]||n===sel||lensState!=='open')return;
-  const labels=captureLabels(),previewOpacity=preview===n?+getComputedStyle(big).opacity:1;
+  const labels=captureLabels();
   // Save the visible component position before cancelling an interrupted movement.
   const visiblePart=by[big.dataset.n]?.c==='part'?rectOf(drawn(big)):null;
   clearMorph();stopExtract();clearTimeout(previewT);hoverLock=true;hovered=null;
   const from=sel,still=instant||lensReduced.matches;
   if(!back)trail.push(from);
-  if(preview===n){
-    const keep=by[sel].componentAlias||sel;preview=null;say('');
-    sel=n;markTile(selectedTile(n));fill(by[n],keep,true);
-    if(!still&&previewOpacity<1)motion(big,[{opacity:previewOpacity},{opacity:1}],180*(1-previewOpacity),0,'ease-out');
-    const epoch=morphEpoch;requestAnimationFrame(()=>{if(epoch===morphEpoch&&sel===n)focusPart(null);});
-    updateBack();layoutLeads();moveLabels(labels,still);if(instant)$('#iname').focus({preventScroll:true});return;
-  }
   if(preview){preview=null;setBig(from);}
   say('');focusPart(null);
   sel=n;markTile(selectedTile(n));
-  const showing=big.dataset.n,showingPart=by[showing]?.componentAlias||(by[showing]?.c==='part'?showing:null);
+  const showing=big.dataset.n,showingPart=by[showing]?.c==='part'?showing:null;
   if(!still&&by[n].c==='part'&&movablePart(big,n)){
     const principal=principalPart(big,n),source=[principal.el],a=rectOf(source),paints=partPaintKinds(source);
     const g=ghostOf();
     fill(by[n]);const b=rectOf(drawn(big));
-    if(a&&b&&sameAspect(a,b)&&paints===partPaintKinds(drawn(big))&&sameOrientation(g.querySelectorAll(`[data-part="${n}"]`)[principal.index],big)){
-      g.querySelectorAll(`[data-part="${n}"]`)[principal.index].remove();
+    if(!by[n].contextClipped&&(by[n].originPart||(a&&b&&sameAspect(a,b)&&paints===partPaintKinds(drawn(big))&&sameOrientation(g.querySelectorAll(partSelector(n))[principal.index],big)))){
+      g.querySelectorAll(partSelector(n))[principal.index].remove();
       // Clear the surrounding strokes before the only visible part starts moving.
-      cam(big,poseFor(big,b,a),[0,0,1],200,100);
+      cam(big,by[n].originPart&&!by[n].contextClipped?[0,0,1]:poseFor(big,b,a),[0,0,1],200,100);
       const fade=motion(g,softenOut,100,0,"linear");
       afterMotion(fade,()=>{g.remove();fade.cancel();});
     }else{
       // Different silhouettes or orientations use a stationary transition, with no mid-zoom shape swap.
       const fade=motion(g,softenOut,100,0,'linear');afterMotion(fade,()=>{g.remove();fade.cancel();});motion(big,sharpenIn,100,100);
     }
-  }else if(!still&&showingPart&&tagged(n).includes(`data-part="${showingPart}"`)){
+  }else if(!still&&showingPart&&inspection(n).body.includes(`data-instance="${showingPart}"`)){
     const a=visiblePart||rectOf(drawn(big)),g=ghostOf();
     fill(by[n]);const principal=principalPart(big,showingPart),holds=principal?[principal.el]:[],b=rectOf(holds);
-    if(a&&b&&sameAspect(a,b)&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)&&sameOrientation(g,holds[0])){
+    if(principal&&!by[showingPart].contextClipped&&(by[showingPart].originPart||(a&&b&&sameAspect(a,b)&&movablePart(big,showingPart)&&partPaintKinds(drawn(g))===partPaintKinds(holds)&&sameOrientation(g,holds[0])))){
       holds.forEach(x=>x.classList.add('hold'));
-      const move=cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),200);
+      const move=by[showingPart].originPart&&!by[showingPart].contextClipped?cam(g,[0,0,1],[0,0,1],200):cam(g,poseFor(g,rectOf(drawn(g)),a),poseFor(g,rectOf(drawn(g)),b),200);
       // Keep the arrived part visible while its surrounding strokes sharpen back in.
       move.onfinish=()=>{};
       const reveal=motion(big,sharpenIn,100,200);
@@ -2389,13 +2440,16 @@ function hoverTile(b){
   if(morphs.some(a=>a.playState==='running'))return;
   if(!b){previewT=setTimeout(()=>{if(preview){preview=null;swapPreview(sel);}focusPart(null);say('');},90);return;}
   const n=b.dataset.inspect;
-  if(b.dataset.rel==='part'){if(preview){preview=null;swapPreview(sel,n);}focusPart(n);say(by[n].title);return;}
-  if(preview!==n){preview=n;swapPreview(n,by[sel].componentAlias||sel);}
-  say(by[n].title);
+  focusPart(n);say(by[n].title);
 }
-sheet.addEventListener('pointermove',e=>{if(e.movementX||e.movementY)hoverLock=false;},{passive:true});
+let pointerPosition=null;
+function releaseHoverLock(e){
+  if(!pointerPosition||e.clientX!==pointerPosition.x||e.clientY!==pointerPosition.y)hoverLock=false;
+  pointerPosition={x:e.clientX,y:e.clientY};
+}
+sheet.addEventListener('pointermove',releaseHoverLock,{passive:true});
 let hovered=null;
-asmEl.addEventListener('pointermove',e=>{if(e.movementX||e.movementY)hoverLock=false;if(hoverLock||morphs.some(a=>a.playState==='running'))return;const b=e.target.closest('[data-inspect]');if(b&&b!==hovered){hovered=b;hoverTile(b);}});
+asmEl.addEventListener('pointermove',e=>{releaseHoverLock(e);if(hoverLock||morphs.some(a=>a.playState==='running'))return;const b=e.target.closest('[data-inspect]');if(b&&b!==hovered){hovered=b;hoverTile(b);}});
 asmEl.addEventListener('pointerleave',()=>{hovered=null;});
 asmEl.addEventListener('pointerleave',()=>hoverTile(null));
 asmEl.addEventListener('focusin',e=>{const b=e.target.closest('[data-inspect]');if(b)hoverTile(b);});

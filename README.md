@@ -18,7 +18,7 @@ Icons use a 48 × 48 grid, a nominal 40 px safe area and a 2 px primary stroke, 
 
 Recurring shapes are stored as reusable parts: the car front, the charging bolt, the turn arrowhead and the off slash. The current library contains 77 parts. One car-front part appears in 8 icons; one maneuver arrowhead appears in 59.
 
-Parts keep the set consistent. Composed icons reuse the same base geometry, so updates to a shared part flow through its references. In the browser, open a part to see every icon that uses it, or open an icon to see its parts.
+Parts keep the set consistent. Composed icons reuse the same base geometry, so updates to a shared part flow through its references. In the browser, open an icon to inspect its constituent parts. Selecting a part follows the composition down to its base shapes; terminal symbols have no child cards. Repeated parts retain their individual direction and placement.
 
 ![The shared car-front part and eight icons that reuse it](docs/images/reusable-parts.png)
 
