@@ -16,7 +16,7 @@ Icons use a 48 × 48 grid, a nominal 40 px safe area and a 2 px primary stroke, 
 
 ## An icon library with its own parts library
 
-Recurring shapes are stored as reusable parts: the car front, the charging bolt, the turn arrowhead and the off slash. The current library contains 77 parts. One car-front part appears in 8 icons; one maneuver arrowhead appears in 59.
+The library contains 77 reusable parts, including the car front, charging bolt, turn arrowhead and off slash. The same car-front part appears in 8 icons. All 64 turn-by-turn icons include an arrowhead part.
 
 Parts keep the set consistent. Composed icons reuse the same base geometry, so updates to a shared part flow through its references. In the browser, open an icon to inspect its constituent parts. Selecting a part follows the composition down to its base shapes; terminal symbols have no child cards. Repeated parts retain their individual direction and placement.
 
@@ -60,7 +60,7 @@ Design and rules by [Paxton Yao](https://github.com/Paxton0209). Drawn with Clau
 
 ## 中文说明
 
-**Dashline 包含 419 个座舱图标和 77 个可复用部件。** 由 Paxton Yao 与 Claude、Codex 按共同设计规则完成。车头部件用于 8 个图标，导航箭头部件用于 59 个图标；在网页中可查看部件关系，并复制独立 SVG。
+**Dashline 包含 419 个座舱图标和 77 个可复用部件。** 由 Paxton Yao 与 Claude、Codex 按共同设计规则完成。车头部件用于 8 个图标，箭头部件覆盖全部 64 个转向图标。在网页中可查看部件关系并复制独立 SVG。
 
 - **可以：** 在你自己的产品、项目、客户交付中免费使用，包括商用。
 - **公开分享时请署名：** 在帖子、教程、视频中使用时，请注明 `图标：Dashline by Paxton Yao — github.com/Paxton0209/Dashline`。

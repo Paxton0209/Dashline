@@ -5,6 +5,11 @@ const pw=require('playwright'),assert=require('assert');
   const result=await page.evaluate(async()=>{
     const failures=[],icons=ICONS.filter(o=>o.c!=='part'),parts=ICONS.filter(o=>o.c==='part');
     const refs=new Map(icons.map(o=>[o.n,new Set([...tagged(o.n).matchAll(/data-part="([^"]+)"/g)].map(m=>m[1]))]));
+    const arrowhead='part/maneuver_arrowhead';
+    for(const n of Object.keys(tbtCenterOffsets)){
+      const cards=inspectorLinks(by[n]).names.filter(id=>by[id].originPart===arrowhead);
+      if(cards.length!==1)failures.push([n,'expected one arrowhead card',cards.length]);
+    }
     let cards=0;
     for(const part of parts){
       const expected=icons.filter(o=>refs.get(o.n).has(part.n)).map(o=>o.n).sort();

@@ -7,6 +7,18 @@ for(const [index,title] of [[0,'Right arrow'],[1,'Left arrow']]){await p.locator
 // Interrupt entry with back, then enter the other occurrence.
 await p.locator('#part-links button').first().click();await p.waitForTimeout(45);await p.locator('#back').click();await p.waitForTimeout(40);await p.locator('#part-links button').nth(1).click();await p.waitForTimeout(350);assert.equal(await p.locator('#iname').textContent(),'Left arrow');assert.equal(await p.locator('.ghost').count(),0);await p.locator('#back').click();await p.waitForTimeout(330);
 await p.locator('#part-links button').nth(0).focus();await p.keyboard.press('Enter');assert.equal(await p.locator('#iname').textContent(),'Right arrow');await p.locator('#back').focus();await p.keyboard.press('Enter');assert.equal(await p.locator('#iname').textContent(),'Swap');
+await p.keyboard.press('Escape');
+await p.locator('.it[data-c="drive"]').click();
+await p.locator('.t[data-n="nav/lb_3branch_left"]').click();
+assert.equal(await p.locator('#relation-label').textContent(),'Parts');
+const arrowhead=p.getByRole('button',{name:'Maneuver arrowhead',exact:true});
+await arrowhead.hover();
+assert.equal(await p.locator('#big [data-part="part/maneuver_arrowhead"].hl').count(),1);
+await arrowhead.press('Enter');
+assert.equal(await p.locator('#relation-label').textContent(),'Used in');
+assert.equal(await p.locator('#part-links [data-inspect="nav/lb_3branch_left"]').count(),1);
+await p.locator('#back').press('Enter');
+assert.equal(await p.locator('#iname').textContent(),'Left-back 3-way left');
 await open('general/bluetooth');assert.equal(await p.locator('#part-links button').count(),0);assert.equal(await p.locator('#relation-label').isVisible(),false);
 await open('general/mic_off');const slash=await p.evaluate(()=>inspection(sel).entries.find(n=>by[n].originPart==='part/off_slash'));await p.locator(`[data-inspect="${slash}"]`).click();await p.waitForTimeout(330);assert.equal(await p.locator('#part-links').getAttribute('data-kind'),'uses');assert.equal(await p.locator('#part-links [data-inspect="general/mic_off"]').count(),1);
 await open('vehicle/fast_charge');const bolt=await p.evaluate(()=>inspection(sel).entries.find(n=>by[n].originPart==='part/bolt'));assert.ok(bolt);await p.locator(`[data-inspect="${bolt}"]`).click();await p.waitForTimeout(330);
