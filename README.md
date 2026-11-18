@@ -63,7 +63,7 @@ Design and rules by [Paxton Yao](https://github.com/Paxton0209). Drawn with Clau
 **Dashline 包含 419 个座舱图标和 77 个可复用部件。** 由 Paxton Yao 与 Claude、Codex 按共同设计规则完成。车头部件用于 8 个图标，导航箭头部件用于 59 个图标；在网页中可查看部件关系，并复制独立 SVG。
 
 - **可以：** 在你自己的产品、项目、客户交付中免费使用，包括商用。
-- **公开分享时请署名：** 作品集展示无需署名；在帖子、教程、视频中使用时，请注明 `图标：Dashline by Paxton Yao — github.com/Paxton0209/Dashline`。
+- **公开分享时请署名：** 在帖子、教程、视频中使用时，请注明 `图标：Dashline by Paxton Yao — github.com/Paxton0209/Dashline`。
 - **不可以：** 把 Dashline（无论是否修改）重新打包成你自己的图标库、素材包、模板发布或售卖，也不可以去掉署名当作自己的作品。
 
 图标采用自定义免费使用许可，网站逻辑与样式采用 MIT 许可，第三方内容沿用原有条款。完整条款见 [LICENSE.md](LICENSE.md)，具体设计规则见 [DESIGN.md](DESIGN.md)。
