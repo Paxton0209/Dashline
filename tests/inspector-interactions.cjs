@@ -1,5 +1,24 @@
 const pw=require('playwright'),assert=require('assert'),fs=require('fs');
 (async()=>{const report={};for(const engine of ['chromium','webkit','firefox']){const b=await pw[engine].launch(),p=await b.newPage({viewport:{width:1280,height:900}});await p.goto((process.env.DASHLINE_URL||'http://127.0.0.1:8864'));
+const search=p.getByRole('textbox',{name:'Search icons'});
+const vehicle=p.locator('.it[data-c="vehicle"]');
+const vehiclePane=p.locator('.pane.on[data-k="vehicle"]');
+const searchPane=p.locator('.pane.on[data-k="_q"]');
+await vehicle.click();
+await vehiclePane.waitFor();
+const vehicleCount=await vehiclePane.getByRole('button').count();
+for(const whitespace of ['   ','\u3000']){
+  await search.fill('  GLOVEBOX  ');
+  await searchPane.getByRole('button',{name:'Glovebox',exact:true}).waitFor();
+  assert.equal(await searchPane.getByRole('button').count(),1);
+  await search.fill(whitespace);
+  await vehiclePane.waitFor({timeout:3000});
+  assert.equal(await p.locator('#h1').textContent(),'Vehicle');
+  assert.equal(await vehicle.getAttribute('aria-current'),'page');
+  assert.equal(await vehiclePane.getByRole('button').count(),vehicleCount);
+  assert.equal(await p.locator('#find kbd').isVisible(),true);
+}
+await search.press('Escape');
 await p.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedSvg=text;}}}));
 const open=async n=>p.evaluate(n=>{clearMorph();finishLens();select(n);stopLens();lensState='open';},n);
 await open('general/swap');assert.equal(await p.locator('#relation-label').textContent(),'Parts');assert.equal(await p.locator('#part-links button').count(),2);
@@ -21,7 +40,7 @@ await p.locator('#back').press('Enter');
 assert.equal(await p.locator('#iname').textContent(),'Left-back 3-way left');
 await p.keyboard.press('Escape');
 await p.locator('.it[data-c="vehicle"]').click();
-await p.locator('.t[data-n="vehicle/glovebox"]').click();
+await vehiclePane.locator('.t[data-n="vehicle/glovebox"]').click();
 assert.equal(await p.locator('#relation-label').textContent(),'Parts');
 const chevron=p.getByRole('button',{name:'Chevron',exact:true});
 await chevron.focus();
@@ -66,4 +85,4 @@ const touch=await b.newPage({viewport:{width:390,height:844},hasTouch:true});awa
 await touch.evaluate(()=>{select('vehicle/fast_charge');stopLens();lensState='open';go(inspection(sel).entries[0],{instant:true});});
 await touch.locator('#part-links [data-inspect="status/battery_full_charging"]').tap();await touch.waitForTimeout(220);assert.equal(await touch.locator('#big').getAttribute('data-n'),'status/battery_full_charging');assert.equal(await touch.locator('#iname').textContent(),'Bolt');assert.equal(await touch.evaluate(()=>trail.length),1);await touch.close();
 await p.emulateMedia({reducedMotion:'reduce'});await open('general/download');await p.locator('#part-links button').nth(1).click();assert.equal(await p.locator('#iname').textContent(),'Transfer tray');assert.equal(await p.evaluate(()=>morphs.length),0);
-report[engine]={repeatedOccurrences:true,quickBack:true,keyboard:true,terminal:true,componentUses:true,batteryUses:true,previewOnly:true,touchPreview:true,reducedMotion:true,copySvg:true};await b.close();}console.log(report);})();
+report[engine]={whitespaceSearch:true,repeatedOccurrences:true,quickBack:true,keyboard:true,terminal:true,componentUses:true,batteryUses:true,previewOnly:true,touchPreview:true,reducedMotion:true,copySvg:true};await b.close();}console.log(report);})();
