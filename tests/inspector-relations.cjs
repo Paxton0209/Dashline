@@ -10,6 +10,41 @@ const pw=require('playwright'),assert=require('assert');
       const cards=inspectorLinks(by[n]).names.filter(id=>by[id].originPart===arrowhead);
       if(cards.length!==1)failures.push([n,'expected one arrowhead card',cards.length]);
     }
+    const expectedParts={
+      'general/open':['chevron','chevron'],
+      'general/expand':['direction_arrow','direction_arrow'],
+      'general/unlock':['lock_shackle','lock_body'],
+      'general/data_collection':['direction_arrow'],
+      'drive/search_along_route':['zoom_lens'],
+      'drive/weather_cloudy':['weather_cloud','weather_cloud'],
+      'drive/weather_cloudy_color':['weather_cloud','weather_cloud'],
+      'drive/weather_partly_cloudy':['weather_cloud'],
+      'drive/weather_partly_cloudy_color':['weather_cloud'],
+      'media/queue_reverse':['direction_arrow'],
+      'media/audiobook':['headphones'],
+      'vehicle/mirror_fold':['mirror'],
+      'vehicle/hud':['navigation_pointer'],
+      'vehicle/screen_clean':['screen'],
+      'vehicle/custom':['steering_wheel'],
+      'vehicle/ota_update':['direction_arrow'],
+      'vehicle/parking_exit':['direction_arrow'],
+      'vehicle/hill_descent':['car_side','direction_arrow'],
+      'vehicle/regen_braking':['bolt'],
+      'vehicle/abs':['brake_ring'],
+      'vehicle/brake_warning':['brake_ring'],
+      'vehicle/battery_12v':['plus_mark'],
+      'vehicle/coolant_temp':['thermometer'],
+      'ac/front_defrost':['windshield_airflow','curved_airflow_arrow','curved_airflow_arrow','curved_airflow_arrow'],
+      'ac/rear_defrost':['curved_airflow_arrow','curved_airflow_arrow','curved_airflow_arrow'],
+      'status/battery_full_charging':['battery_shell','bolt'],
+      'status/battery_mid_charging':['battery_shell','bolt'],
+      'vehicle/battery_preconditioning':['battery_shell','curved_airflow_arrow','curved_airflow_arrow','curved_airflow_arrow']
+    };
+    for(const [n,parts] of Object.entries(expectedParts)){
+      const expected=parts.map(part=>`part/${part}`);
+      const actual=inspectorLinks(by[n]).names.map(id=>by[id].originPart);
+      if(JSON.stringify(actual)!==JSON.stringify(expected))failures.push([n,'Parts mismatch',actual,expected]);
+    }
     let cards=0;
     for(const part of parts){
       const expected=icons.filter(o=>refs.get(o.n).has(part.n)).map(o=>o.n).sort();
