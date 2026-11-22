@@ -61,7 +61,7 @@ svg.ic{display:block;overflow:visible}
 .find kbd{font:var(--t-cap);color:var(--t3);padding:0 7px;border-radius:var(--ds-radius-thumb);background:var(--fill)}
 .find.has kbd{display:none}
 .nav{position:relative;display:flex;flex-direction:column;gap:2px}
-.navind{position:absolute;left:0;right:0;top:0;height:38px;border-radius:var(--ds-radius-control);background:var(--fill2);z-index:0;pointer-events:none}
+.navind{position:absolute;left:0;right:0;top:0;height:38px;border-radius:var(--ds-radius-control);background:var(--panel);box-shadow:var(--lift);z-index:0;pointer-events:none}
 .navind[data-slide]{transition:transform .24s var(--out)}
 @media(prefers-reduced-motion:reduce){.navind[data-slide]{transition:none}}
 .it{position:relative;z-index:1;display:flex;align-items:center;height:38px;padding:0 12px;border-radius:var(--ds-radius-control);color:var(--t2);text-align:left;font:var(--t-body);transition:background-color .2s,color .2s}
@@ -296,7 +296,7 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
 @media(max-width:900px){
   .app::before,.app::after{grid-area:side;inset:0 0 -12px;width:auto}
   .navind{display:none}
-  .it.on{background:var(--fill2)}
+  .it.on{background:var(--panel);box-shadow:var(--lift)}
 }
 
 
