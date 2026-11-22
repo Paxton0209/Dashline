@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ds-radius-thumb:4px; --ds-radius-control:6px; --ds-radius-panel:10px;
+  --ds-radius-thumb:4px; --ds-radius-control:8px; --ds-radius-panel:12px;--ds-radius-surface:16px;
   --side:#f7f7f7; --bg:#f7f7f7; --panel:#ffffff; --stage:#f3f3f3; --ink:#1d1d1f; --t2:rgba(29,29,31,.74); --t3:rgba(29,29,31,.6); --t4:rgba(29,29,31,.28);
   --icon:#1d1d1f; --hair:rgba(0,0,0,.075); --lift:0 1px 2px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.06); --fill:rgba(29,29,31,.05); --fill2:rgba(29,29,31,.08); --sel:rgba(29,29,31,.06);
   --pill:#fff; --pill-sh:0 1px 2px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.04);
@@ -92,7 +92,7 @@ svg.ic{display:block;overflow:visible}
 .meta{padding:8px 12px 0;font:var(--t-cap);color:var(--t3)}
 
 /* ---------- content ---------- */
-.main{grid-area:main;margin:8px 8px 8px 0;border-radius:var(--ds-radius-panel);background:var(--panel);box-shadow:var(--lift);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:background-color .4s,border-radius .3s}
+.main{grid-area:main;margin:8px 8px 8px 0;border-radius:var(--ds-radius-surface);background:var(--panel);box-shadow:var(--lift);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:background-color .4s,border-radius .3s}
 
 .mhead{flex:none;display:flex;align-items:center;gap:12px;height:76px;padding:0 20px 0 36px;border-bottom:1px solid transparent;transition:border-color .2s}
 .mhead.sc{border-bottom-color:var(--hair)}
@@ -168,7 +168,7 @@ svg.ic{display:block;overflow:visible}
 .veil{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.15);opacity:0;pointer-events:none}
 :root[data-theme=dark] .veil{background:rgba(0,0,0,.55)}
 body.modal .veil{opacity:1;pointer-events:auto;touch-action:none}
-.sheet-card{display:none;position:fixed;top:0;left:0;z-index:41;pointer-events:none;background:var(--panel);border-radius:var(--ds-radius-panel)}
+.sheet-card{display:none;position:fixed;top:0;left:0;z-index:41;pointer-events:none;background:var(--panel);border-radius:var(--ds-radius-surface)}
 body.modal .sheet-card{display:block}
 .sheet-shadow{position:absolute;inset:0;border-radius:inherit;box-shadow:0 16px 52px rgba(0,0,0,.12);opacity:0}
 .sheet{position:fixed;z-index:42;left:50%;top:calc(50% - 24px);width:min(880px,calc(100vw - 48px));height:min(600px,calc(100dvh - 96px));transform:translate(-50%,-50%);display:none;grid-template-columns:minmax(0,1fr) minmax(285px,36%);outline:none}
@@ -197,7 +197,7 @@ body.modal .sheet{display:grid}
 .t.sel .ic{visibility:hidden}
 .t.sel{background:transparent}
 @media (max-width:620px){
-  .sheet{top:auto;bottom:0;left:0;transform:none;width:100%;height:min(92dvh,590px);grid-template-columns:1fr;grid-template-rows:minmax(135px,1fr) minmax(172px,1fr);border-radius:var(--ds-radius-panel) var(--ds-radius-panel) 0 0;background:var(--panel);overflow:hidden}
+  .sheet{top:auto;bottom:0;left:0;transform:none;width:100%;height:min(92dvh,590px);grid-template-columns:1fr;grid-template-rows:minmax(135px,1fr) minmax(172px,1fr);border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0;background:var(--panel);overflow:hidden}
   body.modal .sheet-card{display:none}
   .stage{width:min(48vw,190px,max(110px,calc(44dvh - 68px)))}
   .sr{padding:0 22px 20px}
@@ -273,7 +273,7 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
   .credit{padding-inline:18px;background:var(--panel)}
   .find{margin-bottom:8px}
   .nav{flex-direction:row;overflow-x:auto;scrollbar-width:none}.it{flex:none}.it em{display:none}
-  .main{margin:12px 0 0;border-radius:var(--ds-radius-panel) var(--ds-radius-panel) 0 0;min-height:80vh}
+  .main{margin:12px 0 0;border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0;min-height:80vh}
   .mhead,.scroll{padding-left:18px;padding-right:18px}
   .grp{grid-template-columns:1fr}.gh{padding:0 0 6px}.gh span{display:inline;margin-left:8px}
   .insp{position:fixed;inset:auto 0 0 0;z-index:50;transform:translateY(100%);transition:transform .3s var(--out)}
