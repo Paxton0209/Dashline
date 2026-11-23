@@ -602,7 +602,8 @@ body.leading .stage .keys>g{opacity:1}
 .app>.theme-toggle{grid-area:main;justify-self:end;align-self:start;position:relative;z-index:3;margin:20px 25px 0 0;background:var(--panel)}
 /* Group labels stick to the top of the panel; the appearance button lives at the right end of that row. */
 .scroll{padding-top:0;mask-image:linear-gradient(to bottom,#000 calc(100% - var(--library-fade-bottom,0px)),transparent)}
-.gh{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:56px;padding:0;margin-bottom:-6px;background:var(--panel)}
+.gh{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:56px;padding:0;margin-bottom:-6px;background:var(--panel);transition:background-color .4s}
+.app>.theme-toggle{transition:background-color .4s,color 160ms,opacity 150ms,scale 110ms ease-out}
 .grp{padding-top:16px}
 .grp:first-child{padding-top:0}
 .app>.theme-toggle:hover{background:var(--panel)}
