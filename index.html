@@ -92,7 +92,8 @@ svg.ic{display:block;overflow:visible}
 .meta{padding:8px 12px 0;font:var(--t-cap);color:var(--t3)}
 
 /* ---------- content ---------- */
-.main{grid-area:main;margin:8px 8px 8px 0;border-radius:var(--ds-radius-control);background:var(--panel);box-shadow:var(--lift);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:background-color .4s,border-radius .3s}
+/* Keep the panel's rounded surface separate from the scroll area's clip. */
+.main{grid-area:main;margin:8px 8px 8px 0;border-radius:var(--ds-radius-control);background:var(--panel);box-shadow:var(--lift);display:flex;flex-direction:column;min-height:0;min-width:0;transition:background-color .4s,border-radius .3s}
 
 .mhead{flex:none;display:flex;align-items:center;gap:12px;height:76px;padding:0 20px 0 36px;border-bottom:1px solid transparent;transition:border-color .2s}
 .mhead.sc{border-bottom-color:var(--hair)}
@@ -168,7 +169,7 @@ svg.ic{display:block;overflow:visible}
 .veil{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.15);opacity:0;pointer-events:none}
 :root[data-theme=dark] .veil{background:rgba(0,0,0,.55)}
 body.modal .veil{opacity:1;pointer-events:auto;touch-action:none}
-.sheet-card{display:none;position:fixed;top:0;left:0;z-index:41;pointer-events:none;background:var(--panel);border-radius:var(--ds-radius-surface)}
+.sheet-card{display:none;position:fixed;top:0;left:0;z-index:41;pointer-events:none;background:var(--panel);border-radius:var(--ds-radius-panel);transform-origin:top left}
 body.modal .sheet-card{display:block}
 .sheet-shadow{position:absolute;inset:0;border-radius:inherit;box-shadow:0 16px 52px rgba(0,0,0,.12);opacity:0}
 .sheet{position:fixed;z-index:42;left:50%;top:calc(50% - 24px);width:min(880px,calc(100vw - 48px));height:min(600px,calc(100dvh - 96px));transform:translate(-50%,-50%);display:none;grid-template-columns:minmax(0,1fr) minmax(285px,36%);outline:none}
@@ -2204,8 +2205,10 @@ function lensSpring(el,from,to,format,stiffness=500,damping=38){
     return format(from.map((v,k)=>v+(to[k]-v)*p));
   }),{duration});
 }
-function box(r,radius=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ds-radius-panel'))){return [r.left,r.top,r.width,r.height,radius];}
-function cardStyle([x,y,w,h,r]){return {transform:`translate(${x}px,${y}px)`,width:w+'px',height:h+'px',borderRadius:r+'px'};}
+function cardPose(rect,rest){
+  return [rect.left-rest.left,rect.top-rest.top,rect.width/rest.width,rect.height/rest.height];
+}
+const cardStyle=([x,y,sx,sy])=>({transform:`translate(${x}px,${y}px) scale(${sx},${sy})`});
 function lensPose(r,target){
   return [r.left+r.width/2-target.left-target.width/2,r.top+r.height/2-target.top-target.height/2,r.width/target.width];
 }
@@ -2214,9 +2217,11 @@ function sourceFor(n,el){
   if(!el?.isConnected || (el.dataset.n||el.dataset.inspect)!==n)return null;
   const glyph=el.querySelector('.ic')?.getBoundingClientRect(),cell=el.getBoundingClientRect();
   if(!glyph?.width||cell.bottom<=0||cell.top>=innerHeight||cell.right<=0||cell.left>=innerWidth)return null;
-  return {glyph,card:box(cell,parseFloat(getComputedStyle(el).borderTopLeftRadius)||0)};
+  return {glyph,cell};
 }
-function setCard(frame){Object.assign(card.style,cardStyle(frame));}
+function setCard({left,top,width,height}){
+  Object.assign(card.style,{left:left+'px',top:top+'px',width:width+'px',height:height+'px'});
+}
 function selectedTile(n){return AP().querySelector(`.t[data-n="${n}"]`);}
 function markTile(tile){$('.t.sel')?.classList.remove('sel');if(tile)tile.classList.add('sel');}
 function select(n,trigger){
@@ -2240,7 +2245,7 @@ function select(n,trigger){
   sheet.setAttribute('aria-hidden','false');
   app.inert=true;
   sheet.focus({preventScroll:true});
-  const end=box(sheet.getBoundingClientRect()), art=stage.getBoundingClientRect();
+  const end=sheet.getBoundingClientRect(), art=stage.getBoundingClientRect();
   setCard(end);
   layoutLeads();
   if(lensReduced.matches){shadow.style.opacity='1';return;}
@@ -2249,11 +2254,11 @@ function select(n,trigger){
   if(lensCompact.matches){
     lensSpring(sheet,[100],[0],([y])=>({transform:`translateY(${y}%)`}),420,40);
   }else if(source){
-    const shell=lensSpring(card,source.card,end,cardStyle);
+    lensSpring(card,cardPose(source.cell,end),[0,0,1,1],cardStyle);
     lensSpring(stage,lensPose(source.glyph,art),[0,0,1],artworkStyle);
     lensAnimate(grid,[{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
-    lensAnimate(details,[{opacity:0},{opacity:1}],{duration:180,delay:170,easing:'ease-out'});
-    shell.onfinish=()=>{if(lensState==='open')lensAnimate(shadow,[{opacity:0},{opacity:1}],{duration:220,easing:'ease-out'});};
+    lensAnimate(details,[{opacity:0},{opacity:1}],{duration:150,delay:96,easing:'ease-out'});
+    lensAnimate(shadow,[{opacity:0},{opacity:1}],{duration:180,delay:120,easing:'ease-out'});
   }else{
     lensAnimate(card,[{opacity:0},{opacity:1}],{duration:200,easing:lensEase});
     lensAnimate(sheet,[{opacity:0},{opacity:1}],{duration:200,easing:lensEase});
@@ -2275,7 +2280,7 @@ function closeInsp(){
   lensState='closing';resetSvgCopy();stopExtract();clearTimeout(previewT);clearTimeout(leadsT);leads.replaceChildren();document.body.classList.remove('leading');if(preview){preview=null;setBig(sel);}focusPart(null);say('');clearMorph();
   if(lensReduced.matches){finishLens();return;}
   const source=sourceFor(sel,lensAnchor)||sourceFor(sel,selectedTile(sel));
-  const currentCard=box(card.getBoundingClientRect(),parseFloat(getComputedStyle(card).borderTopLeftRadius)||0);
+  const currentCard=card.getBoundingClientRect();
   const currentStage=stage.getBoundingClientRect();
   const currentSheet=sheet.getBoundingClientRect();
   const opacity=el=>Number(getComputedStyle(el).opacity);
@@ -2286,12 +2291,13 @@ function closeInsp(){
   if(lensCompact.matches){
     end=lensSpring(sheet,[100*(currentSheet.top-sheet.getBoundingClientRect().top)/currentSheet.height],[100],([y])=>({transform:`translateY(${y}%)`}),420,42);
   }else if(source){
+    const restCard=sheet.getBoundingClientRect();
     const rest=stage.getBoundingClientRect();
     lensSpring(stage,lensPose(currentStage,rest),lensPose(source.glyph,rest),artworkStyle);
     lensAnimate(grid,[{opacity:gridOpacity},{opacity:0}],{duration:180,easing:'ease-in'});
     lensAnimate(details,[{opacity:contentOpacity},{opacity:0}],{duration:100,easing:'ease-in'});
     lensAnimate(shadow,[{opacity:shadowOpacity},{opacity:0}],{duration:80});
-    end=lensSpring(card,currentCard,source.card,cardStyle);
+    end=lensSpring(card,cardPose(currentCard,restCard),cardPose(source.cell,restCard),cardStyle);
   }else{
     lensAnimate(card,[{opacity:cardOpacity},{opacity:0}],{duration:150,easing:'ease-in'});
     end=lensAnimate(sheet,[{opacity:sheetOpacity},{opacity:0}],{duration:150,easing:'ease-in'});
@@ -2620,7 +2626,7 @@ veil.onclick=closeInsp;
 addEventListener('resize',()=>{
   if(lensState==='closed')return;
   if(lensState==='closing'){finishLens();return;}
-  clearMorph();stopLens();setCard(box(sheet.getBoundingClientRect()));shadow.style.opacity='1';layoutLeads(false);
+  clearMorph();stopLens();setCard(sheet.getBoundingClientRect());shadow.style.opacity='1';layoutLeads(false);
 });
 function szRect(){const b=$('#sizes button.on small');if(!b)return null;const p=$('#sizes').getBoundingClientRect(),r=b.getBoundingClientRect();return {x:r.left-p.left,y:r.top-p.top,w:r.width,h:r.height};}
 let szFrom=null;
