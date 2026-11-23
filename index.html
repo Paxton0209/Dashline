@@ -27,7 +27,7 @@
   --weather-sun:#9E620D; --weather-rain:#276CA5; --weather-snow:#45689D; --weather-fog:#556D88;
   color-scheme:light;
 }
-:root[data-theme=dark] body{background:radial-gradient(60% 50% at 0% 100%,rgba(255,150,90,.08),transparent 70%),radial-gradient(50% 45% at 18% 0%,rgba(90,120,255,.1),transparent 70%),var(--bg)}
+:root[data-theme=dark] body{background:var(--bg)}
 :root[data-theme=dark]{
   --side:#1a1b1d; --bg:#18191b; --panel:#222326; --stage:#2a2b2e; --ink:#f5f5f7; --t2:rgba(245,245,247,.74); --t3:rgba(245,245,247,.56); --t4:rgba(245,245,247,.26);
   --icon:#f5f5f7; --hair:rgba(255,255,255,.08); --lift:0 0 0 1px rgba(255,255,255,.08); --fill:rgba(255,255,255,.05); --fill2:rgba(255,255,255,.09); --sel:rgba(255,255,255,.07);
@@ -50,11 +50,11 @@ svg.ic{display:block;overflow:visible}
 .credit{grid-area:credit;display:flex;column-gap:6px;align-items:baseline;padding:12px 24px 16px;background:transparent;font:var(--t-cap);color:var(--t3)}
 .credit a{color:inherit;text-decoration:none;transition:color .2s}
 .credit a:hover,.credit a:focus-visible{color:var(--ink);text-decoration:underline}
-.side{grid-area:side;display:flex;flex-direction:column;padding:8px 12px 16px;background:transparent;min-height:0;overflow:auto;scrollbar-width:none}
+.side{grid-area:side;display:flex;flex-direction:column;padding:32px 12px 16px;background:transparent;min-height:0;overflow:auto;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
 .brand{padding:10px 12px 0;font:var(--t-body);font-weight:500;height:32px}
-.find{margin:0 0 16px;display:flex;align-items:center;gap:8px;height:38px;padding:0 10px 0 14px;border-radius:var(--ds-radius-control);background:var(--panel);box-shadow:var(--lift);transition:background-color .2s,box-shadow .2s}
-.find:focus-within{background:var(--panel);box-shadow:0 0 0 1px rgba(0,0,0,.14),0 0 0 4px rgba(0,0,0,.04)}
+.find{display:flex;align-items:center;gap:8px;flex:0 1 280px;min-width:0;max-width:280px;height:40px;margin:0;padding:0 10px 0 12px;border:1px solid var(--hair);border-radius:var(--ds-radius-control);background:transparent;box-shadow:none;transition:border-color .16s,box-shadow .16s}
+.find:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
 .find svg{width:20px;height:20px;color:var(--t3);flex:none}
 .find input{flex:1;min-width:0;font:var(--t-body)}
 .find input::placeholder{color:var(--t3)}
@@ -122,7 +122,7 @@ svg.ic{display:block;overflow:visible}
 .tb.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .tb.theme svg{position:absolute;transition:transform .45s cubic-bezier(.34,1.4,.64,1),opacity .25s}
 :root[data-theme=dark] .tb.theme .sun,:root:not([data-theme=dark]) .tb.theme .moon{opacity:0;transform:rotate(-70deg) scale(.6)}
-.scroll{flex:1;overflow:auto;padding:8px 32px 80px}
+.scroll{flex:1;overflow:auto;padding:8px 24px 80px;scroll-padding-block:40px;mask-image:linear-gradient(to bottom,transparent,#000 var(--library-fade-top,0px),#000 calc(100% - var(--library-fade-bottom,0px)),transparent)}
 .view{position:relative}
 .pane{position:absolute;left:0;right:0;top:0;content-visibility:hidden;pointer-events:none}
 .pane.on{position:relative;content-visibility:visible;pointer-events:auto;will-change:opacity,transform}
@@ -136,8 +136,6 @@ svg.ic{display:block;overflow:visible}
 .tiles{content-visibility:auto;contain-intrinsic-size:auto 200px;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cell),1fr));gap:2px}
 .t{position:relative;width:100%;height:var(--cell);border-radius:var(--ds-radius-control);display:grid;place-items:center;color:var(--icon);outline:0;transition:background-color .2s ease}
 .t:hover{background:var(--fill)}
-.t .nm{position:absolute;left:4px;right:4px;bottom:7px;text-align:center;font:var(--t-cap);font-size:12px;line-height:14px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(3px);transition:opacity .15s ease,transform .25s var(--out);pointer-events:none}
-.t:hover .nm{opacity:1;transform:none;transition-delay:.45s}
 .t:active,.t.sel{background:var(--fill2)}
 .t:focus-visible{box-shadow:0 0 0 2px var(--accent)}
 .t .ic{position:absolute;inset:0;margin:auto;width:var(--sz);height:var(--sz)}
@@ -165,14 +163,17 @@ svg.ic{display:block;overflow:visible}
 @keyframes theme-reveal{from{--theme-reveal-progress:0px;opacity:.5}to{--theme-reveal-progress:var(--theme-reveal-radius);opacity:1}}
 }
 
-/* The card shell and the artwork share a spring, without scaling the details. */
+/* The surface and controls share motion; artwork retains its source trajectory. */
+@property --dialog-surface-opacity{syntax:"<number>";inherits:true;initial-value:1}
+@property --dialog-copy-opacity{syntax:"<number>";inherits:true;initial-value:1}
 .veil{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.15);opacity:0;pointer-events:none}
 :root[data-theme=dark] .veil{background:rgba(0,0,0,.55)}
 body.modal .veil{opacity:1;pointer-events:auto;touch-action:none}
-.sheet-card{display:none;position:fixed;top:0;left:0;z-index:41;pointer-events:none;background:var(--panel);border-radius:var(--ds-radius-panel);transform-origin:top left}
-body.modal .sheet-card{display:block}
-.sheet-shadow{position:absolute;inset:0;border-radius:inherit;box-shadow:0 16px 52px rgba(0,0,0,.12);opacity:0}
-.sheet{position:fixed;z-index:42;left:50%;top:calc(50% - 24px);width:min(880px,calc(100vw - 48px));height:min(600px,calc(100dvh - 96px));transform:translate(-50%,-50%);display:none;grid-template-columns:minmax(0,1fr) minmax(285px,36%);outline:none}
+.sheet{position:fixed;z-index:42;left:50%;top:calc(50% - 24px);width:min(880px,calc(100vw - 48px));height:min(600px,calc(100dvh - 96px));transform:translate(-50%,-50%);transform-origin:top left;display:none;grid-template-columns:minmax(0,1fr) minmax(285px,36%);outline:none;isolation:isolate;border-radius:var(--ds-radius-panel);will-change:transform,filter}
+.sheet::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:var(--panel);border-radius:inherit;box-shadow:0 16px 52px rgba(0,0,0,.12);opacity:var(--dialog-surface-opacity)}
+.sheet .sr,.sheet .keys{opacity:var(--dialog-surface-opacity)}
+.sheet .acts2{opacity:var(--dialog-copy-opacity)}
+.sheet[data-closing]{pointer-events:none}
 body.modal .sheet{display:grid}
 .sl{position:relative;display:grid;place-items:center;min-width:0;pointer-events:none}
 .stage{position:relative;width:min(76%,352px,max(120px,calc(100dvh - 256px)));aspect-ratio:1;color:var(--icon)}
@@ -199,7 +200,6 @@ body.modal .sheet{display:grid}
 .t.sel{background:transparent}
 @media (max-width:620px){
   .sheet{top:auto;bottom:0;left:0;transform:none;width:100%;height:min(92dvh,590px);grid-template-columns:1fr;grid-template-rows:minmax(135px,1fr) minmax(172px,1fr);border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0;background:var(--panel);overflow:hidden}
-  body.modal .sheet-card{display:none}
   .stage{width:min(48vw,190px,max(110px,calc(44dvh - 68px)))}
   .sr{padding:0 22px 20px}
   .sr .iph{height:42px}
@@ -272,7 +272,7 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
   .app,body.insp .app{grid-template:"side" auto "main" auto "credit" auto / minmax(0,1fr);height:auto}
   .side{padding:16px 12px 0}.foot,.subs,.meta{display:none}
   .credit{padding-inline:18px;background:var(--panel)}
-  .find{margin-bottom:8px}
+  .find{margin:0}
   .nav{flex-direction:row;overflow-x:auto;scrollbar-width:none}.it{flex:none}.it em{display:none}
   .main{margin:12px 0 0;border-radius:var(--ds-radius-control) var(--ds-radius-control) 0 0;min-height:80vh}
   .mhead,.scroll{padding-left:18px;padding-right:18px}
@@ -283,25 +283,20 @@ body.insp .ib{opacity:1;transform:none;transition-delay:.06s}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
 
-/* Static sidebar tint: no backdrop sampling while modal SVG filters animate. */
-.app{position:relative;isolation:isolate}
-.app::before,.app::after{content:"";position:absolute;inset:0 auto 0 0;width:260px;pointer-events:none;z-index:-1}
-.app::before{background:var(--bg)}
-.app::after{background:transparent}
-:root[data-theme=dark] .app::before{background:linear-gradient(to top,rgba(86,136,156,.14) 0%,rgba(112,119,166,.065) 22%,rgba(112,119,166,.02) 42%,rgba(112,119,166,0) 72%),#1b1b1c}
-:root[data-theme=dark] .app::after{background:rgba(27,27,28,.42)}
+/* The sidebar and all space around the inset panel share one canvas. */
+.app{position:relative;isolation:isolate;background:var(--bg)}
 
 /* Match DriveScene Studio's shared corner geometry. */
 :where(body,body *){corner-shape:superellipse(1.6)}
 @media(max-width:900px){
-  .app::before,.app::after{grid-area:side;inset:0 0 -12px;width:auto}
   .navind{display:none}
   .it.on{background:var(--panel);box-shadow:var(--lift)}
 }
 
 
-/* ---- No title row: the sidebar already names the category and its size. ---- */
-.mhead{height:56px;padding:0 16px 0 32px;justify-content:flex-end}
+/* Global search and appearance share a toolbar; category stays in the sidebar. */
+.mhead{height:80px;padding:24px 24px 16px;justify-content:space-between;border-bottom:0}
+.mhead.sc{box-shadow:inset 0 -1px 0 var(--hair)}
 .mhead h1,.mhead>#hn,.mhead .sp{display:none}
 .mtools{display:flex;align-items:center;gap:2px}
 .xr{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:var(--ds-radius-control);color:var(--ink);transition:background-color .12s,color .16s}
@@ -574,12 +569,26 @@ body.leading .stage .keys>g{opacity:1}
 .social-links a{display:inline-flex;align-items:center;min-height:32px;color:var(--t3);font:400 12px/20px var(--font);text-decoration:none;text-underline-offset:3px;text-decoration-thickness:1px;white-space:nowrap;transition:color .16s ease-out;-webkit-tap-highlight-color:transparent}
 .social-links a:hover{color:var(--ink);text-decoration:underline}
 .social-links a:focus-visible{color:var(--ink);text-decoration:underline;outline:2px solid var(--accent);outline-offset:4px;border-radius:var(--ds-radius-thumb)}
+
+/* Keep narrow-window rules after the desktop grid overrides. */
+@media(max-width:900px){
+  body{overflow:hidden}
+  .app,body.xray .app{grid-template:"side" auto "main" minmax(0,1fr) "credit" auto / minmax(0,1fr);height:100dvh}
+  .side{min-width:0;padding:8px 8px 0}
+  .nav{padding:4px;scroll-padding-inline:40px;mask-image:linear-gradient(to right,transparent,#000 var(--nav-fade-start,0px),#000 calc(100% - var(--nav-fade-end,0px)),transparent)}
+  .it:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .main{min-height:0;margin:8px 8px 0;border-radius:var(--ds-radius-control)}
+  .mhead{height:72px;padding:16px}
+  .find{flex:1;max-width:none}
+  .scroll{padding:8px 16px 40px}
+  .social-links{margin:4px 16px 8px}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="side">
-    <label class="find" id="find"><input id="q" aria-label="Search icons" placeholder="Search" autocomplete="off" spellcheck="false"><kbd>/</kbd></label>
     <nav class="nav" id="nav" aria-label="Icon categories"></nav>
     <section class="anat" id="anat" aria-label="Anatomy" aria-live="polite">
       <div class="aview"><svg class="ic" viewBox="0 0 48 48" fill="none" id="abig" aria-hidden="true"></svg></div>
@@ -589,7 +598,7 @@ body.leading .stage .keys>g{opacity:1}
   </aside>
 
   <main class="main" aria-label="Icon library">
-    <header class="mhead" id="mhead"><h1 id="h1">General</h1><span id="hn"></span><div class="sp"></div>
+    <header class="mhead" id="mhead"><label class="find" id="find"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m12.5 12.5 4 4"/></svg><input id="q" aria-label="Search all icons" placeholder="Search all icons" autocomplete="off" spellcheck="false"><kbd>/</kbd></label><h1 id="h1">General</h1><span id="hn"></span><div class="sp"></div>
       <div class="mtools"><button class="xr" id="xr" type="button" aria-pressed="false" aria-label="Show components (X)" title="Components  X"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 3H10.3C10.74 3 11.610776 3 12.055388 3.444612C12.5 3.889224 12.5 4.76 12.5 5.2V10.3C12.5 10.74 12.5 11.610776 12.055388 12.055388C11.610776 12.5 10.74 12.5 10.3 12.5H5.2C4.76 12.5 3.889224 12.5 3.444612 12.055388C3 11.610776 3 10.74 3 10.3V5.2C3 4.76 3 3.889224 3.444612 3.444612C3.889224 3 4.76 3 5.2 3Z"/><path d="M7.5 15.2V15.5C7.5 15.8 7.5 16.393711 7.803144 16.696856C8.106289 17 8.7 17 9 17H15C15.3 17 15.893711 17 16.196856 16.696856C16.5 16.393711 16.5 15.8 16.5 15.5V9.5C16.5 9.2 16.5 8.606289 16.196856 8.303144C15.893711 8 15.3 8 15 8H14.7" stroke-dasharray="1.6 2.2"/></svg></button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false"><svg data-appearance width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.25a6.75 6.75 0 0 0 0 13.5Z" fill="currentColor"/></svg></button></div>
     </header>
     <div class="scroll" id="scroll"><div class="view" id="view"></div></div>
@@ -607,7 +616,6 @@ body.leading .stage .keys>g{opacity:1}
 
 <div class="tcap" id="tcap" aria-hidden="true"></div>
 <div class="veil" id="veil"></div>
-<div class="sheet-card" id="sheet-card" aria-hidden="true"><div class="sheet-shadow"></div></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="iname" aria-hidden="true" tabindex="-1">
   <svg class="leads off" id="leads" aria-hidden="true"></svg>
   <div class="sl" id="sl">
@@ -710,11 +718,11 @@ const ICONS=[
   {"n":"general/unlock_fill","c":"general","s":"<path d=\"M28.8412 16.25A5 5 0 0 0 19 17.5V22.5\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/lock_body}}","g":"System"},
   {"n":"general/keyboard","c":"general","s":"<path d=\"M13 15H35{{corner:35 15 37 15 37 17}}V31{{corner:37 31 37 33 35 33}}H13{{corner:13 33 11 33 11 31}}V17{{corner:11 17 11 15 13 15}}Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"16.5\" cy=\"20.3\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"21.5\" cy=\"20.3\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"26.5\" cy=\"20.3\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"31.5\" cy=\"20.3\" r=\"1.3\" fill=\"currentColor\"/><path d=\"M19 28H29\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"System"},
   {"n":"general/qr_code","c":"general","s":"<g transform=\"translate(24.0000 24.0000) scale(0.960000) translate(-24.0000 -24.0000)\"><path d=\"M13.5 12H19.5{{corner:19.5 12 21 12 21 13.5}}V19.5{{corner:21 19.5 21 21 19.5 21}}H13.5{{corner:13.5 21 12 21 12 19.5}}V13.5{{corner:12 13.5 12 12 13.5 12}}Z\" stroke-width=\"2.083333\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M28.5 12H34.5{{corner:34.5 12 36 12 36 13.5}}V19.5{{corner:36 19.5 36 21 34.5 21}}H28.5{{corner:28.5 21 27 21 27 19.5}}V13.5{{corner:27 13.5 27 12 28.5 12}}Z\" stroke-width=\"2.083333\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M13.5 27H19.5{{corner:19.5 27 21 27 21 28.5}}V34.5{{corner:21 34.5 21 36 19.5 36}}H13.5{{corner:13.5 36 12 36 12 34.5}}V28.5{{corner:12 28.5 12 27 13.5 27}}Z\" stroke-width=\"2.083333\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M28 29.5C28.8284 29.5 29.5 28.8284 29.5 28C29.5 27.1716 28.8284 26.5 28 26.5C27.1716 26.5 26.5 27.1716 26.5 28C26.5 28.8284 27.1716 29.5 28 29.5Z\" fill=\"currentColor\"/><path d=\"M34 29.5C34.8284 29.5 35.5 28.8284 35.5 28C35.5 27.1716 34.8284 26.5 34 26.5C33.1716 26.5 32.5 27.1716 32.5 28C32.5 28.8284 33.1716 29.5 34 29.5Z\" fill=\"currentColor\"/><path d=\"M28 35.5C28.8284 35.5 29.5 34.8284 29.5 34C29.5 33.1716 28.8284 32.5 28 32.5C27.1716 32.5 26.5 33.1716 26.5 34C26.5 34.8284 27.1716 35.5 28 35.5Z\" fill=\"currentColor\"/><path d=\"M34 35.5C34.8284 35.5 35.5 34.8284 35.5 34C35.5 33.1716 34.8284 32.5 34 32.5C33.1716 32.5 32.5 33.1716 32.5 34C32.5 34.8284 33.1716 35.5 34 35.5Z\" fill=\"currentColor\"/></g>","g":"System"},
-  {"n":"drive/poi","c":"drive","s":"{{part/pin}}","g":"Places"},
-  {"n":"drive/search_nearby","c":"drive","s":"<path d=\"M31.9112 30.0612C33.8238 30.78 35 31.7599 35 32.84C35 35.049 30.075 36.84 24 36.84C17.925 36.84 13 35.049 13 32.84C13 31.7599 14.1762 30.78 16.0888 30.0612\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/pin:search_nearby}}","g":"Places"},
-  {"n":"drive/way_point","c":"drive","s":"{{part/pin:way_point}}<path d=\"M15 39H33\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Places"},
+  {"n":"drive/poi","c":"drive","s":"{{part/pin}}<circle cx=\"24\" cy=\"20.5\" r=\"3.5\" stroke=\"currentColor\" stroke-width=\"2\"/>","g":"Places"},
+  {"n":"drive/search_nearby","c":"drive","s":"<path d=\"M31.9112 30.0612C33.8238 30.78 35 31.7599 35 32.84C35 35.049 30.075 36.84 24 36.84C17.925 36.84 13 35.049 13 32.84C13 31.7599 14.1762 30.78 16.0888 30.0612\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/pin:search_nearby}}<circle cx=\"24\" cy=\"19.2\" r=\"2.9\" stroke=\"currentColor\" stroke-width=\"2\"/>","g":"Places"},
+  {"n":"drive/way_point","c":"drive","s":"{{part/pin:way_point}}<circle cx=\"24\" cy=\"18.25\" r=\"3.05\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M15 39H33\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Places"},
   {"n":"drive/add_stop","c":"drive","s":"{{part/pin:add_stop}}<g transform=\"translate(0 -2)\">{{part/plus_mark:tiny}}</g>","g":"Places"},
-  {"n":"drive/city_along_route","c":"drive","s":"<path d=\"M32.2959 27.7034L33.923 27.0254{{corner:33.923 27.0254 36 26.15993 36 28.41}}V35.41{{corner:36 35.41 36 37.659959 33.9231 36.7946}}L30.7692 35.4805{{corner:30.7692 35.4805 29.999993 35.160003 29.2308 35.4805}}L24.7692 37.3395{{corner:24.7692 37.3395 24 37.66 23.2308 37.3395}}L18.7692 35.4805{{corner:18.7692 35.4805 18.000007 35.160003 17.2308 35.4805}}L14.0769 36.7946{{corner:14.0769 36.7946 12 37.659959 12 35.41}}V28.41{{corner:12 28.41 12 26.15993 14.077 27.0254}}L15.7041 27.7034\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/pin:city_along_route}}","g":"Places"},
+  {"n":"drive/city_along_route","c":"drive","s":"<path d=\"M32.2959 27.7034L33.923 27.0254{{corner:33.923 27.0254 36 26.15993 36 28.41}}V35.41{{corner:36 35.41 36 37.659959 33.9231 36.7946}}L30.7692 35.4805{{corner:30.7692 35.4805 29.999993 35.160003 29.2308 35.4805}}L24.7692 37.3395{{corner:24.7692 37.3395 24 37.66 23.2308 37.3395}}L18.7692 35.4805{{corner:18.7692 35.4805 18.000007 35.160003 17.2308 35.4805}}L14.0769 36.7946{{corner:14.0769 36.7946 12 37.659959 12 35.41}}V28.41{{corner:12 28.41 12 26.15993 14.077 27.0254}}L15.7041 27.7034\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/pin:city_along_route}}<circle cx=\"24\" cy=\"18.55\" r=\"2.7\" stroke=\"currentColor\" stroke-width=\"2\"/>","g":"Places"},
   {"n":"drive/search_along_route","c":"drive","s":"<g transform=\"translate(24.0000 24.0000) scale(1.075000) translate(-24.0000 -24.0000)\"><path d=\"M30 12.5H16C13.2 12.5 11 14.7 11 17.5C11 20.3 13.2 22.5 16 22.5\" stroke-width=\"1.860465\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/zoom_lens:search_along_route}}</g>","g":"Places"},
   {"n":"drive/position","c":"drive","s":"<path d=\"M27 24C27 25.657 25.657 27 24 27C22.343 27 21 25.657 21 24C21 22.343 22.343 21 24 21C25.657 21 27 22.343 27 24Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M33 24H39M33 24C33 28.971 28.971 33 24 33M33 24C33 19.029 28.971 15 24 15M9 24H15M15 24C15 28.971 19.029 33 24 33M15 24C15 19.029 19.029 15 24 15M24 33V39M24 9V15\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Places"},
   {"n":"drive/destination","c":"drive","s":"<g transform=\"translate(24.0000 24.0000) scale(1.075000) translate(-24.0000 -24.0000)\"><path d=\"M14.5 36V25.5M14.5 25.5V13.9967{{corner:14.5 13.9967 14.5 12 16.5 12}}H32.0222{{corner:32.0222 12 34.999942 12 33.2275 14.3928}}L30.8818 17.5595{{corner:30.8818 17.5595 29.99995 18.75 30.8818 19.9405}}L33.2275 23.1072{{corner:33.2275 23.1072 34.999942 25.5 32.0222 25.5}}L14.5 25.5Z\" stroke-width=\"1.860465\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>","g":"Places"},
@@ -1039,7 +1047,7 @@ const ICONS=[
   {"n":"vehicle/passenger_airbag_off","c":"vehicle","s":"<g style=\"color:var(--warning)\"><rect x=\"10.6\" y=\"12.6\" width=\"11.75\" height=\"11.75\" rx=\"1.8\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M14 16L18.95 20.95M18.95 16L14 20.95\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><g transform=\"translate(5.1 2)\">{{part/climate_occupant}}</g></g>","g":"Lights & safety","t":"Passenger airbag off"},
   {"n":"vehicle/battery_preconditioning","c":"vehicle","s":"","g":"Energy","a":"battery thermal preconditioning preparing battery for fast charging"},
   {"n":"vehicle/energy_stats","c":"vehicle","s":"<path d=\"M12 12V34{{corner:12 34 12 36 14 36}}H36\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M16.5 30C19.5 30 20 22 23.5 22C27 22 27.5 27 30.5 27C33 27 33.5 19 35.5 17\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Energy"},
-  {"n":"vehicle/trip_distance","c":"vehicle","s":"{{part/pin:trip_distance}}{{part/direction_arrow:adjust_trip}}","g":"Energy"},
+  {"n":"vehicle/trip_distance","c":"vehicle","s":"{{part/pin:trip_distance}}<path d=\"M26.8007 17.48C26.8007 18.1483 26.5352 18.7893 26.0627 19.2619C25.5901 19.7345 24.9491 20 24.2807 20C23.6124 20 22.9714 19.7345 22.4988 19.2619C22.0262 18.7893 21.7607 18.1483 21.7607 17.48C21.7607 16.8116 22.0262 16.1706 22.4988 15.698C22.9714 15.2255 23.6124 14.96 24.2807 14.96C24.9491 14.96 25.5901 15.2255 26.0627 15.698C26.5352 16.1706 26.8007 16.8116 26.8007 17.48Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/direction_arrow:adjust_trip}}","g":"Energy"},
   {"n":"vehicle/regen_braking","c":"vehicle","s":"{{part/bolt:regen_braking}}<path d=\"M30.0001 13.6077C34.7037 16.3234 36.9969 21.8597 35.5912 27.1059C34.1855 32.3521 29.4314 36 24.0001 36C18.5688 36 13.8147 32.3521 12.409 27.1059C11.0033 21.8597 13.2965 16.3234 18.0001 13.6077M13.2001 12.3L18.0001 13.6077L16.7001 18.4\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Energy"},
   {"n":"vehicle/v2l","c":"vehicle","s":"<g transform=\"translate(17 24) scale(0.48 0.53) translate(-24 -24)\">{{part/bolt}}</g><path d=\"M26 21.5V18.9996{{corner:26 18.9996 26 17 24 17}}H10{{corner:10 17 8 17 8 19}}V29{{corner:8 29 8 31 10 31}}H24{{corner:24 31 26 31 26 29.0003}}V26.5M26 21.5V26.5M26 21.5H28.5V26.5H26M33.5 24H40M36.5 27.5L40 24L36.5 20.5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Energy"},
   {"n":"vehicle/power_outlet","c":"vehicle","s":"<path d=\"M24 12.5C30.3513 12.5 35.5 17.6487 35.5 24C35.5 30.3513 30.3513 35.5 24 35.5C17.6487 35.5 12.5 30.3513 12.5 24C12.5 17.6487 17.6487 12.5 24 12.5Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M19.5 21V27M28.5 21V27\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Energy"},
@@ -1100,7 +1108,7 @@ const ICONS=[
   {"n":"part/sun_on_horizon","c":"part","s":"<path d=\"M14.49 31.45C14.49 28.8694 15.5151 25.6446 17.3399 23.8198C19.1646 21.9951 21.6394 20.97 24.22 20.97C26.8006 20.97 29.2754 21.9951 31.1001 23.8198C32.9249 25.6446 33.95 28.8694 33.95 31.45M14.49 31.45H11.5M14.49 31.45H33.95M33.95 31.45H36.94M13.74 35.94H34.7M13.4508 22.1808L11.5 20.23M34.9892 22.1808L36.94 20.23\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","g":"Climate & weather"},
   {"n":"part/windshield_airflow","c":"part","s":"<path d=\"M10.1 18.55Q24 8.85 37.9 18.55Q38.75 19.14 38.2 20.06L33.3 30.09Q32.85 31.0 31.9 30.72Q24 28.5 16.1 30.72Q15.15 31 14.7 30.09L9.8 20.06Q9.25 19.14 10.1 18.55Z\" stroke=\"currentColor\" stroke-width=\"2.94193548\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","g":"Climate & weather","t":"Windshield","new":true},
   {"n":"part/heat_wave","c":"part","s":"<path d=\"M24 33C21.4 30.5 21.4 26.5 24 24C26.6 21.5 26.6 17.5 24 15\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","g":"Climate & weather","t":"Heat wave"},
-  {"n":"part/pin","c":"part","s":"<path d=\"M23.2000 37.2500C20.7000 34.8000 13.5000 27.6500 13.5000 20.5000C13.5000 14.7010 18.2010 10.0000 24.0000 10.0000C29.7990 10.0000 34.5000 14.7010 34.5000 20.5000C34.5000 27.6500 27.3000 34.8000 24.8000 37.2500Q24.0000 38.0500 23.2000 37.2500Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"24\" cy=\"20.5\" r=\"3.5\" stroke=\"currentColor\" stroke-width=\"2\"/>","g":"Controls & devices"},
+  {"n":"part/pin","c":"part","s":"<path d=\"M23.2000 37.2500C20.7000 34.8000 13.5000 27.6500 13.5000 20.5000C13.5000 14.7010 18.2010 10.0000 24.0000 10.0000C29.7990 10.0000 34.5000 14.7010 34.5000 20.5000C34.5000 27.6500 27.3000 34.8000 24.8000 37.2500Q24.0000 38.0500 23.2000 37.2500Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Controls & devices"},
   {"n":"part/speaker","c":"part","s":"<path d=\"M12 28H15.1716{{corner:15.1716 28 16 28 16.5858 28.5858}}L21.4393 33.4393{{corner:21.4393 33.4393 24 36 24 32.3787}}V15.6213{{corner:24 15.6213 24 12 21.4393 14.5607}}L16.5858 19.4142{{corner:16.5858 19.4142 16 20 15.1716 20}}H12{{corner:12 20 10 20 10 22}}V26{{corner:10 26 10 28 12 28}}Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Controls & devices"},
   {"n":"part/lock","c":"part","s":"<path d=\"M19 22.5C17.2263 22.5 16 22.5 16 22.5{{corner:16 22.5 14 22.5 14 24.5}}V33.5{{corner:14 33.5 14 35.5 16 35.5}}H32{{corner:32 35.5 34 35.5 34 33.5}}V24.5{{corner:34 24.5 34 22.5 32 22.5}}C32 22.5 30.7737 22.5 29 22.5M19 22.5C21.8592 22.5 26.1408 22.5 29 22.5M19 22.5L19 17.5C19 16.1739 19.5268 14.9021 20.4645 13.9645C21.4021 13.0268 22.6739 12.5 24 12.5C25.3261 12.5 26.5979 13.0268 27.5355 13.9645C28.4732 14.9021 29 16.1739 29 17.5V22.5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Controls & devices"},
   {"n":"part/phone","c":"part","s":"<path d=\"M14.905 10.5H17.9485L20.992 17.4565L17.9485 20.5C19.6876 24.4131 23.6007 28.3261 27.5137 30.0652L30.5572 27.0218L37.5137 30.0652V33.1087C37.5137 35.7174 35.3398 37.8913 32.7311 37.4565C21.8615 35.7174 12.2963 26.1522 10.5571 15.2826C10.1224 12.6739 12.2963 10.5 14.905 10.5Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Controls & devices"},
@@ -1437,11 +1445,11 @@ const partVariants={
   "part/maneuver_arrowhead:rf_2branch_right":"<path d=\"M40.1907 13.5715L24.4801 10.5548{{corner:24.4801 10.5548 22.588575 10.191595 23.6774 11.7803}}L28.4243 18.7065C28.4884 18.8001 28.5317 18.9063 28.5512 19.018L30.0465 27.5819{{corner:30.0465 27.5819 30.375103 29.463877 31.4744 27.9015}}L40.6891 14.8051{{corner:40.6891 14.8051 41.394438 13.802638 40.1907 13.5715}}Z\" fill=\"currentColor\"/>",
   "part/maneuver_arrowhead:ring_rightback":"<path d=\"M39.478 37.7741L36.1163 22.1337{{corner:36.1163 22.1337 35.711543 20.250556 34.6745 21.8737}}L30.1537 28.9495C30.0926 29.0451 30.0118 29.1264 29.9165 29.188L22.6177 33.9106{{corner:22.6177 33.9106 21.013708 34.948444 22.8815 35.3499}}L38.5373 38.7149{{corner:38.5373 38.7149 39.73557 38.972452 39.478 37.7741}}Z\" fill=\"currentColor\"/>",
   "part/maneuver_arrowhead:ring_left":"<path d=\"M11.217 20.9588L18.4795 25.5313{{corner:18.4795 25.5313 19.610314 26.243265 19.3156 24.9399}}L18.3546 20.6899{{corner:18.3546 20.6899 18.327331 20.569303 18.3539 20.4485}}L19.3256 16.0304{{corner:19.3256 16.0304 19.610285 14.736001 18.4888 15.4421}}L11.217 20.0205{{corner:11.217 20.0205 10.471853 20.489652 11.217 20.9588}}Z\" fill=\"currentColor\"/>",
-  "part/pin:search_nearby":"<path d=\"M23.3800 32.1812C21.4425 30.2825 15.8625 24.7413 15.8625 19.2000C15.8625 14.7058 19.5058 11.0625 24.0000 11.0625C28.4942 11.0625 32.1375 14.7058 32.1375 19.2000C32.1375 24.7413 26.5575 30.2825 24.6200 32.1812Q24.0000 32.8012 23.3800 32.1812Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"24\" cy=\"19.2\" r=\"2.9\" stroke=\"currentColor\" stroke-width=\"2\"/>",
-  "part/pin:way_point":"<path d=\"M23.3000 32.9062C21.1125 30.7625 14.8125 24.5063 14.8125 18.2500C14.8125 13.1759 18.9259 9.0625 24.0000 9.0625C29.0741 9.0625 33.1875 13.1759 33.1875 18.2500C33.1875 24.5063 26.8875 30.7625 24.7000 32.9062Q24.0000 33.6063 23.3000 32.9062Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"24\" cy=\"18.25\" r=\"3.05\" stroke=\"currentColor\" stroke-width=\"2\"/>",
+  "part/pin:search_nearby":"<path d=\"M23.3800 32.1812C21.4425 30.2825 15.8625 24.7413 15.8625 19.2000C15.8625 14.7058 19.5058 11.0625 24.0000 11.0625C28.4942 11.0625 32.1375 14.7058 32.1375 19.2000C32.1375 24.7413 26.5575 30.2825 24.6200 32.1812Q24.0000 32.8012 23.3800 32.1812Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
+  "part/pin:way_point":"<path d=\"M23.3000 32.9062C21.1125 30.7625 14.8125 24.5063 14.8125 18.2500C14.8125 13.1759 18.9259 9.0625 24.0000 9.0625C29.0741 9.0625 33.1875 13.1759 33.1875 18.2500C33.1875 24.5063 26.8875 30.7625 24.7000 32.9062Q24.0000 33.6063 23.3000 32.9062Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/pin:add_stop":"<path d=\"M23.2000 37.2500C20.7000 34.8000 13.5000 27.6500 13.5000 20.5000C13.5000 14.7010 18.2010 10.0000 24.0000 10.0000C29.7990 10.0000 34.5000 14.7010 34.5000 20.5000C34.5000 27.6500 27.3000 34.8000 24.8000 37.2500Q24.0000 38.0500 23.2000 37.2500Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
-  "part/pin:city_along_route":"<path d=\"M23.4240 30.6100C21.6240 28.8460 16.4400 23.6980 16.4400 18.5500C16.4400 14.3747 19.8247 10.9900 24.0000 10.9900C28.1753 10.9900 31.5600 14.3747 31.5600 18.5500C31.5600 23.6980 26.3760 28.8460 24.5760 30.6100Q24.0000 31.1860 23.4240 30.6100Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"24\" cy=\"18.55\" r=\"2.7\" stroke=\"currentColor\" stroke-width=\"2\"/>",
-  "part/pin:trip_distance":"<path d=\"M24.28 29.8C24.28 29.8 17 23.36 17 17.48C17 15.5492 17.767 13.6975 19.1323 12.3322C20.4975 10.9669 22.3492 10.2 24.28 10.2C26.2108 10.2 28.0625 10.9669 29.4277 12.3322C30.793 13.6975 31.56 15.5492 31.56 17.48C31.56 23.36 24.28 29.8 24.28 29.8Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M26.8007 17.48C26.8007 18.1483 26.5352 18.7893 26.0627 19.2619C25.5901 19.7345 24.9491 20 24.2807 20C23.6124 20 22.9714 19.7345 22.4988 19.2619C22.0262 18.7893 21.7607 18.1483 21.7607 17.48C21.7607 16.8116 22.0262 16.1706 22.4988 15.698C22.9714 15.2255 23.6124 14.96 24.2807 14.96C24.9491 14.96 25.5901 15.2255 26.0627 15.698C26.5352 16.1706 26.8007 16.8116 26.8007 17.48Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
+  "part/pin:city_along_route":"<path d=\"M23.4240 30.6100C21.6240 28.8460 16.4400 23.6980 16.4400 18.5500C16.4400 14.3747 19.8247 10.9900 24.0000 10.9900C28.1753 10.9900 31.5600 14.3747 31.5600 18.5500C31.5600 23.6980 26.3760 28.8460 24.5760 30.6100Q24.0000 31.1860 23.4240 30.6100Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
+  "part/pin:trip_distance":"<path d=\"M24.28 29.8C24.28 29.8 17 23.36 17 17.48C17 15.5492 17.767 13.6975 19.1323 12.3322C20.4975 10.9669 22.3492 10.2 24.28 10.2C26.2108 10.2 28.0625 10.9669 29.4277 12.3322C30.793 13.6975 31.56 15.5492 31.56 17.48C31.56 23.36 24.28 29.8 24.28 29.8Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/car_front:external_speaker":"<path d=\"M32.3286 19.2954L33.3948 21.542C33.8947 21.6941 34.3192 21.8809 34.6545 22.1237C35.2135 22.5283 35.5247 23.0887 35.5247 23.9037V31.5105{{corner:35.5247 31.5105 35.5247 32.5247 34.5105 32.5247}}H32.1198{{corner:32.1198 32.5247 31.5765 32.5247 31.5765 31.8002}}V31.5829{{corner:31.5765 31.5829 31.5765 31.0033 30.9607 31.0033}}H17.3409{{corner:17.3409 31.0033 16.7251 31.0033 16.7251 31.5829}}V31.8002{{corner:16.7251 31.8002 16.7251 32.5247 16.1818 32.5247}}H13.7911{{corner:13.7911 32.5247 12.7769 32.5247 12.7769 31.5105}}V23.9037C12.7769 23.0887 13.0881 22.5283 13.6471 22.1237C13.9824 21.8809 14.4069 21.6941 14.9068 21.542L16.0912 19.0462L17.2757 16.5505{{corner:17.2757 16.5505 17.774284 15.5 18.9347 15.5}}H29.3669{{corner:29.3669 15.5 30.527344 15.5 31.0259 16.5505}}L32.3286 19.2954ZM32.3286 19.2954L36.0923 19.2672M34.6545 22.1237C30.8149 23.5001 27.4108 24.1934 24.1507 24.1934C20.8907 24.1934 17.4867 23.5001 13.6471 22.1237M16.0912 19.0462L12.7769 19.2672\" stroke-width=\"2.07254\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/car_front:powertrain_fault":"<path d=\"M30.543 22.5829C30.2097 22.3416 29.7878 22.156 29.291 22.0048L28.2313 19.7721L26.9366 17.044{{corner:26.9366 17.044 26.441139 16 25.2878 16}}H14.9198{{corner:14.9198 16 13.766461 16 13.271 17.044}}L11.9763 19.7721M28.2313 19.7721L31.4079 19.744M30.543 22.5829C31.0984 22.9851 31.4078 23.542 31.4078 24.352V31.912{{corner:31.4078 31.912 31.4078 32.92 30.3998 32.92}}H28.0238{{corner:28.0238 32.92 27.4838 32.92 27.4838 32.2}}V31.984{{corner:27.4838 31.984 27.4838 31.408 26.8718 31.408}}H13.3358{{corner:13.3358 31.408 12.7238 31.408 12.7238 31.984}}V32.2{{corner:12.7238 32.2 12.7238 32.92 12.1838 32.92}}H9.8078{{corner:9.8078 32.92 8.7998 32.92 8.7998 31.912}}V24.352C8.7998 23.542 9.10918 22.9851 9.66465 22.5829M30.543 22.5829C26.727 23.9509 23.344 24.64 20.104 24.64C16.864 24.64 13.4806 23.9509 9.66465 22.5829M9.66465 22.5829C9.99793 22.3416 10.4198 22.156 10.9166 22.0048L11.9763 19.7721M11.9763 19.7721L8.7998 19.744\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/car_front:esc":"<path d=\"M14.3108 17.1715C14.6232 16.9453 15.0188 16.7713 15.4845 16.6295L16.4779 14.5363L17.6918 11.9788{{corner:17.6918 11.9788 18.156381 11 19.2375 11}}H28.9575{{corner:28.9575 11 30.038758 11 30.5033 11.9788}}L31.7171 14.5363M31.7171 14.5363L32.7105 16.6295C33.1763 16.7713 33.5718 16.9453 33.8842 17.1715M31.7171 14.5363L34.6951 14.51M33.8842 17.1715C34.405 17.5486 34.695 18.0706 34.695 18.83V25.9175{{corner:34.695 25.9175 34.695 26.8625 33.75 26.8625}}H31.5225{{corner:31.5225 26.8625 31.0163 26.8625 31.0163 26.1875}}V25.985{{corner:31.0163 25.985 31.0163 25.445 30.4425 25.445}}H17.7525{{corner:17.7525 25.445 17.1787 25.445 17.1787 25.985}}V26.1875{{corner:17.1787 26.1875 17.1787 26.8625 16.6725 26.8625}}H14.445{{corner:14.445 26.8625 13.5 26.8625 13.5 25.9175}}V18.83C13.5 18.0706 13.79 17.5486 14.3108 17.1715M33.8842 17.1715C30.3067 18.454 27.1352 19.1 24.0977 19.1C21.0602 19.1 17.8883 18.454 14.3108 17.1715M16.4779 14.5363L13.5 14.51\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
@@ -1815,16 +1823,13 @@ function inspection(n){
   const root=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${tagged(n)}</svg>`,'image/svg+xml').documentElement;
   const visible=e=>!e.closest('defs,mask,clipPath');
   const outer=()=>[...root.querySelectorAll('[data-part]')].filter(e=>!e.parentElement.closest('[data-part]'));
-  const ink=[...root.querySelectorAll('path,circle,rect,line,ellipse,polyline,polygon,use,text')].filter(visible);
-  let nodes=outer().filter(visible);
+  const nodes=outer().filter(visible);
   const activeMasks=new Set([...root.querySelectorAll('[mask]')].filter(visible).map(e=>e.getAttribute('mask')));
   const cutouts=outer().filter(e=>{
     const mask=cutoutMask(e);
     return mask&&activeMasks.has(`url(#${mask.id})`);
   });
-  while(!cutouts.length&&nodes.length===1&&ink.length&&ink.every(e=>nodes[0].contains(e))){
-    nodes[0].removeAttribute('data-part');nodes[0].removeAttribute('data-instance');nodes=outer().filter(visible);
-  }
+  // A whole-icon alias still exposes its one real part, so its reuse is reachable.
   const geometryKeys=new Map(),entries=[];
   [...nodes,...cutouts].forEach((node,index)=>{
     const part=node.getAttribute('data-part'),id=`instance/${++inspectionSerial}`;
@@ -1981,8 +1986,30 @@ function slide(el,axis,from,to,ms=380){
 const groupsOf=k=>[...new Set(ICONS.filter(o=>o.c===k).map(o=>o.g))];
 $('#nav').innerHTML=CATS.filter(c=>c.k!=='part').map(c=>`<button class="it" data-c="${c.k}"><span>${c.t}</span><em>${ICONS.filter(o=>o.c===c.k).length}</em></button>`).join('');
 const navind=document.createElement('span');navind.className='navind';$('#nav').prepend(navind);
+const categoryNav=$('#nav');
+function updateNavFade(){
+  const max=Math.max(0,categoryNav.scrollWidth-categoryNav.clientWidth);
+  const narrow=matchMedia('(max-width:900px)').matches;
+  categoryNav.style.setProperty('--nav-fade-start',narrow&&categoryNav.scrollLeft>1?'40px':'0px');
+  categoryNav.style.setProperty('--nav-fade-end',narrow&&categoryNav.scrollLeft<max-1?'40px':'0px');
+}
+function revealCategory(item){
+  if(!item||!matchMedia('(max-width:900px)').matches){updateNavFade();return;}
+  const outer=categoryNav.getBoundingClientRect(),inner=item.getBoundingClientRect();
+  let left=categoryNav.scrollLeft;
+  if(inner.left<outer.left+40)left+=inner.left-outer.left-40;
+  else if(inner.right>outer.right-40)left+=inner.right-outer.right+40;
+  categoryNav.scrollTo({left,behavior:'auto'});
+  updateNavFade();
+}
+categoryNav.addEventListener('scroll',updateNavFade,{passive:true});
+categoryNav.addEventListener('focusin',e=>revealCategory(e.target.closest('.it')));
+new ResizeObserver(()=>revealCategory(categoryNav.querySelector('.it.on'))).observe(categoryNav);
+document.fonts.ready.then(()=>revealCategory(categoryNav.querySelector('.it.on')));
+
 function moveNav(){
   const on=$('.it.on');
+  revealCategory(on);
   navind.toggleAttribute('data-slide',!!on&&navind.style.opacity==='1');
   navind.style.opacity=on?'1':'0';
   if(on){
@@ -1997,7 +2024,7 @@ $('#nav').addEventListener('click',e=>{const it=e.target.closest('.it');if(it){i
 let list=[];
 function rows(L,showCat){const gs=[...new Set(L.map(o=>o.c+'|'+o.g))];let i=0;
   return gs.map(key=>{const [c,g]=key.split('|');const G=L.filter(o=>o.c===c&&o.g===g);
-    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}" aria-label="${o.title}">${svg(o)}<span class="nm">${o.title}</span></button>`).join('')}</div></div>`}).join('');}
+    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}" aria-label="${o.title}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
 const PANES={};const V=$('#view');
 function pane(k){if(!PANES[k]){const d=document.createElement('div');d.className='pane';d.dataset.k=k;V.appendChild(d);PANES[k]=d;}return PANES[k];}
 function AP(){return V.querySelector('.pane.on')||V;}
@@ -2028,7 +2055,16 @@ function noneHTML(v){const words=[...new Set(ICONS.flatMap(o=>o.title.toLowerCas
   const last=v.split(/\s+/).pop();const sug=words.map(w=>[w,w.startsWith(last.slice(0,3))?0.5:lev(last,w)]).filter(x=>x[1]<=2).sort((a,b)=>a[1]-b[1]).slice(0,4).map(x=>x[0]);
   return `<div class="none"><b>No results</b>Nothing matches “${v.replace(/[<>&]/g,'')}”.${sug.length?`<div class="sug">Try ${sug.map(s=>`<button data-s="${s}">${s}</button>`).join('')}</div>`:''}</div>`;}
 $('#view').addEventListener('click',e=>{const b=e.target.closest('.sug button');if(b){q.value=b.dataset.s;search();}});
-$('#scroll').addEventListener('scroll',()=>{$('#mhead').classList.toggle('sc',$('#scroll').scrollTop>4);},{passive:true});
+const libraryScroll=$('#scroll');
+function updateLibraryFade(){
+  const max=Math.max(0,libraryScroll.scrollHeight-libraryScroll.clientHeight);
+  libraryScroll.style.setProperty('--library-fade-top',libraryScroll.scrollTop>1?'40px':'0px');
+  libraryScroll.style.setProperty('--library-fade-bottom',libraryScroll.scrollTop<max-1?'40px':'0px');
+  $('#mhead').classList.toggle('sc',libraryScroll.scrollTop>4);
+}
+libraryScroll.addEventListener('scroll',updateLibraryFade,{passive:true});
+const libraryResize=new ResizeObserver(updateLibraryFade);
+libraryResize.observe(libraryScroll);libraryResize.observe($('#view'));
 document.addEventListener('animationend',e=>e.target.classList&&e.target.classList.remove('enter'));
 
 
@@ -2179,7 +2215,7 @@ function fill(o,keepFocus,preserveDrawing=false){
   requestAnimationFrame(()=>placeSz(false));
   resetSvgCopy();
 }
-const sheet=$('#sheet'),card=$('#sheet-card'),shadow=card.firstElementChild,veil=$('#veil');
+const sheet=$('#sheet'),veil=$('#veil');
 const stage=$('#stage'),grid=$('#keys'),details=$('.sr'),app=$('.app');
 const lensReduced=matchMedia('(prefers-reduced-motion: reduce)'),lensCompact=matchMedia('(max-width:620px)');
 const lensEase='cubic-bezier(.32,.72,0,1)';
@@ -2208,7 +2244,7 @@ function lensSpring(el,from,to,format,stiffness=500,damping=38){
 function cardPose(rect,rest){
   return [rect.left-rest.left,rect.top-rest.top,rect.width/rest.width,rect.height/rest.height];
 }
-const cardStyle=([x,y,sx,sy])=>({transform:`translate(${x}px,${y}px) scale(${sx},${sy})`});
+const dialogStyle=([x,y,sx,sy])=>({transform:`translate(calc(-50% + ${x}px),calc(-50% + ${y}px)) scale(${sx},${sy})`});
 function lensPose(r,target){
   return [r.left+r.width/2-target.left-target.width/2,r.top+r.height/2-target.top-target.height/2,r.width/target.width];
 }
@@ -2219,8 +2255,29 @@ function sourceFor(n,el){
   if(!glyph?.width||cell.bottom<=0||cell.top>=innerHeight||cell.right<=0||cell.left>=innerWidth)return null;
   return {glyph,cell};
 }
-function setCard({left,top,width,height}){
-  Object.assign(card.style,{left:left+'px',top:top+'px',width:width+'px',height:height+'px'});
+// The dialog surface and right-side controls ride the same spring.
+// Counter-scale only the artwork to preserve its original uniform tile-to-preview path.
+function springDialog(fromCard,toCard,fromArt,toArt,restCard,restArt,fromSurface=1,toSurface=1){
+  const from=[...cardPose(fromCard,restCard),...lensPose(fromArt,restArt),fromSurface];
+  const to=[...cardPose(toCard,restCard),...lensPose(toArt,restArt),toSurface];
+  const cx=restArt.left+restArt.width/2-restCard.left;
+  const cy=restArt.top+restArt.height/2-restCard.top;
+  const closing=toSurface<fromSurface;
+  const initialBlur=parseFloat(getComputedStyle(sheet).filter.match(/blur\(([\d.]+)px\)/)?.[1]||'0');
+  const surface=lensSpring(sheet,from,to,v=>{
+    const alpha=Math.max(0,Math.min(1,v[7]));
+    const progress=closing?Math.max(0,Math.min(1,(fromSurface-v[7])/(fromSurface-toSurface))):0;
+    // Copy clears early, while the spring and the returning glyph finish naturally.
+    const copy=closing?Math.pow(Math.max(0,1-progress/.65),2):1;
+    const blur=closing?initialBlur*(1-progress)+4*Math.sin(Math.PI*progress):0;
+    return {...dialogStyle(v),'--dialog-surface-opacity':alpha,'--dialog-copy-opacity':copy,filter:`blur(${blur}px)`};
+  });
+  const artwork=lensSpring(stage,from,to,([x,y,sx,sy,gx,gy,g])=>({
+    transform:`translate(${(cx+gx-x)/sx-cx}px,${(cy+gy-y)/sy-cy}px) scale(${g/sx},${g/sy})`
+  }));
+  const start=document.timeline.currentTime;
+  surface.startTime=start;artwork.startTime=start;
+  return surface;
 }
 function selectedTile(n){return AP().querySelector(`.t[data-n="${n}"]`);}
 function markTile(tile){$('.t.sel')?.classList.remove('sel');if(tile)tile.classList.add('sel');}
@@ -2230,9 +2287,6 @@ function select(n,trigger){
   const tile=selectedTile(n);
   if(lensState==='open'){
     sel=n;markTile(tile);fill(o);
-    for(const el of [$('#big'),details]){
-      el.classList.remove('sfade');void el.offsetWidth;el.classList.add('sfade');
-    }
     $('#iname').focus({preventScroll:true});
     return;
   }
@@ -2245,31 +2299,26 @@ function select(n,trigger){
   sheet.setAttribute('aria-hidden','false');
   app.inert=true;
   sheet.focus({preventScroll:true});
-  const end=sheet.getBoundingClientRect(), art=stage.getBoundingClientRect();
-  setCard(end);
+  const end=sheet.getBoundingClientRect(),art=stage.getBoundingClientRect();
   layoutLeads();
-  if(lensReduced.matches){shadow.style.opacity='1';return;}
+  if(lensReduced.matches)return;
   grid.classList.add('draw');
   lensAnimate(veil,[{opacity:0},{opacity:1}],{duration:220,easing:lensEase});
   if(lensCompact.matches){
     lensSpring(sheet,[100],[0],([y])=>({transform:`translateY(${y}%)`}),420,40);
   }else if(source){
-    lensSpring(card,cardPose(source.cell,end),[0,0,1,1],cardStyle);
-    lensSpring(stage,lensPose(source.glyph,art),[0,0,1],artworkStyle);
-    lensAnimate(grid,[{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
-    lensAnimate(details,[{opacity:0},{opacity:1}],{duration:150,delay:96,easing:'ease-out'});
-    lensAnimate(shadow,[{opacity:0},{opacity:1}],{duration:180,delay:120,easing:'ease-out'});
+    springDialog(source.cell,end,source.glyph,art,end,art,0,1);
   }else{
-    lensAnimate(card,[{opacity:0},{opacity:1}],{duration:200,easing:lensEase});
     lensAnimate(sheet,[{opacity:0},{opacity:1}],{duration:200,easing:lensEase});
-    lensAnimate(shadow,[{opacity:0},{opacity:1}],{duration:200,easing:lensEase});
   }
 }
 function finishLens(){
   stopLens();
-  grid.classList.remove('draw');shadow.style.opacity='';
+  grid.classList.remove('draw');
   document.body.classList.remove('modal');
   sheet.setAttribute('aria-hidden','true');
+  sheet.removeAttribute('data-closing');
+  resetSvgCopy();clearPreviewMotion();
   markTile(null);app.inert=false;
   const focus=lensAnchor?.isConnected?lensAnchor:selectedTile(sel);
   lensState='closed';sel=null;lensAnchor=null;trail.length=0;preview=null;clearMorph();say('');updateBack();leads.replaceChildren();
@@ -2277,29 +2326,27 @@ function finishLens(){
 }
 function closeInsp(){
   if(lensState!=='open')return;
-  lensState='closing';resetSvgCopy();stopExtract();clearTimeout(previewT);clearTimeout(leadsT);leads.replaceChildren();document.body.classList.remove('leading');if(preview){preview=null;setBig(sel);}focusPart(null);say('');clearMorph();
+  lensState='closing';sheet.setAttribute('data-closing','');
+  clearTimeout(previewT);clearTimeout(leadsT);
+  // Freeze the visible copy result, hover state, and inner transitions until hidden.
+  // Resetting Copied to Copy SVG here would flash during the shrinking motion.
+  freezeCopyForClose();
+  sheet.getAnimations({subtree:true}).filter(a=>!lensMotion.includes(a)).forEach(a=>a.pause());
   if(lensReduced.matches){finishLens();return;}
   const source=sourceFor(sel,lensAnchor)||sourceFor(sel,selectedTile(sel));
-  const currentCard=card.getBoundingClientRect();
-  const currentStage=stage.getBoundingClientRect();
-  const currentSheet=sheet.getBoundingClientRect();
-  const opacity=el=>Number(getComputedStyle(el).opacity);
-  const [backdrop,gridOpacity,contentOpacity,shadowOpacity,sheetOpacity,cardOpacity]=[veil,grid,details,shadow,sheet,card].map(opacity);
+  const currentSheet=sheet.getBoundingClientRect(),currentArt=stage.getBoundingClientRect();
+  const backdrop=Number(getComputedStyle(veil).opacity),sheetOpacity=Number(getComputedStyle(sheet).opacity);
+  const surfaceOpacity=Number(getComputedStyle(sheet).getPropertyValue('--dialog-surface-opacity'));
   stopLens();
   lensAnimate(veil,[{opacity:backdrop},{opacity:0}],{duration:180,easing:'ease-in'});
   let end;
   if(lensCompact.matches){
-    end=lensSpring(sheet,[100*(currentSheet.top-sheet.getBoundingClientRect().top)/currentSheet.height],[100],([y])=>({transform:`translateY(${y}%)`}),420,42);
+    const rest=sheet.getBoundingClientRect();
+    end=lensSpring(sheet,[100*(currentSheet.top-rest.top)/rest.height],[100],([y])=>({transform:`translateY(${y}%)`}),420,42);
   }else if(source){
-    const restCard=sheet.getBoundingClientRect();
-    const rest=stage.getBoundingClientRect();
-    lensSpring(stage,lensPose(currentStage,rest),lensPose(source.glyph,rest),artworkStyle);
-    lensAnimate(grid,[{opacity:gridOpacity},{opacity:0}],{duration:180,easing:'ease-in'});
-    lensAnimate(details,[{opacity:contentOpacity},{opacity:0}],{duration:100,easing:'ease-in'});
-    lensAnimate(shadow,[{opacity:shadowOpacity},{opacity:0}],{duration:80});
-    end=lensSpring(card,cardPose(currentCard,restCard),cardPose(source.cell,restCard),cardStyle);
+    const rest=sheet.getBoundingClientRect(),art=stage.getBoundingClientRect();
+    end=springDialog(currentSheet,source.cell,currentArt,source.glyph,rest,art,surfaceOpacity,0);
   }else{
-    lensAnimate(card,[{opacity:cardOpacity},{opacity:0}],{duration:150,easing:'ease-in'});
     end=lensAnimate(sheet,[{opacity:sheetOpacity},{opacity:0}],{duration:150,easing:'ease-in'});
   }
   end.onfinish=finishLens;
@@ -2593,6 +2640,7 @@ asmEl.addEventListener('click',e=>{const b=e.target.closest('#sizes button');if(
 details.prepend($('#back'));
 $('#back').onclick=e=>{if(trail.length)go(trail.pop(),{back:true,instant:e.detail===0});};
 function hoverTile(b){
+  if(lensState!=='open')return;
   clearTimeout(previewT);
   if(morphs.some(a=>a.playState==='running'))return;
   if(!b){previewT=setTimeout(()=>{if(preview){preview=null;swapPreview(sel);}focusPart(null);say('');},90);return;}
@@ -2626,7 +2674,7 @@ veil.onclick=closeInsp;
 addEventListener('resize',()=>{
   if(lensState==='closed')return;
   if(lensState==='closing'){finishLens();return;}
-  clearMorph();stopLens();setCard(sheet.getBoundingClientRect());shadow.style.opacity='1';layoutLeads(false);
+  clearMorph();stopLens();layoutLeads(false);
 });
 function szRect(){const b=$('#sizes button.on small');if(!b)return null;const p=$('#sizes').getBoundingClientRect(),r=b.getBoundingClientRect();return {x:r.left-p.left,y:r.top-p.top,w:r.width,h:r.height};}
 let szFrom=null;
@@ -2687,7 +2735,16 @@ function clearCopyFeedback(){
   delete copyButton.dataset.copyState;
   copyStatus.textContent='';
 }
+function freezeCopyForClose(){
+  copyRequest=null;
+  copyTimers.forEach(clearTimeout);copyTimers=[];
+  const style=getComputedStyle(copyButton);
+  const opacity=style.opacity,transform=style.transform;
+  copyButton.style.transition='none';
+  copyButton.style.opacity=opacity;copyButton.style.transform=transform;
+}
 function resetSvgCopy(){
+  for(const key of ['transition','opacity','transform'])copyButton.style.removeProperty(key);
   copyRequest=null;
   clearCopyFeedback();
 }

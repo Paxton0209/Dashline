@@ -1,6 +1,6 @@
 # Dashline
 
-**419 cockpit icons and 77 reusable parts for automotive interfaces.** Designed by Paxton Yao with Claude and Codex, using shared geometry and written design rules.
+**420 cockpit icons and 77 reusable parts for automotive interfaces.** Designed by Paxton Yao with Claude and Codex, using shared geometry and written design rules.
 
 [Open Dashline](https://paxton0209.github.io/Dashline/) · [Design notes](DESIGN.md) · [Icon guidelines](https://github.com/Paxton0209/paxton-design-system/blob/main/icons/icon-guideline.en.md) · [中文说明](#中文说明) · [License](LICENSE.md)
 
@@ -10,7 +10,7 @@
 
 | General | Navigation | Media | Vehicle | Climate | Total |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| 84 | 139 | 49 | 106 | 41 | **419** |
+| 85 | 139 | 49 | 106 | 41 | **420** |
 
 Icons use a 48 × 48 grid, a nominal 40 px safe area and a 2 px primary stroke, with optical adjustments for individual shapes. Open any icon in the browser to inspect its parts and copy a standalone SVG. The browser supports search, light and dark themes, and keyboard navigation.
 
@@ -60,7 +60,7 @@ Design and rules by [Paxton Yao](https://github.com/Paxton0209). Drawn with Clau
 
 ## 中文说明
 
-**Dashline 包含 419 个座舱图标和 77 个可复用部件。** 由 Paxton Yao 与 Claude、Codex 按共同设计规则完成。车头部件用于 8 个图标，箭头部件覆盖全部 64 个转向图标。在网页中可查看部件关系并复制独立 SVG。
+**Dashline 包含 420 个座舱图标和 77 个可复用部件。** 由 Paxton Yao 与 Claude、Codex 按共同设计规则完成。车头部件用于 8 个图标，箭头部件覆盖全部 64 个转向图标。在网页中可查看部件关系并复制独立 SVG。
 
 - **可以：** 在你自己的产品、项目、客户交付中免费使用，包括商用。
 - **公开分享时请署名：** 在帖子、教程、视频中使用时，请注明 `图标：Dashline by Paxton Yao — github.com/Paxton0209/Dashline`。
