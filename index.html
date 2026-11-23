@@ -584,10 +584,52 @@ body.leading .stage .keys>g{opacity:1}
   .social-links{margin:4px 16px 8px}
 }
 
+/* ---- Layout trial: search heads the sidebar column; no toolbar row in the panel ---- */
+.app,body.xray .app{grid-template:"find main" auto "side main" minmax(0,1fr) "credit main" auto / 260px minmax(0,1fr)}
+.app>.find{grid-area:find;align-self:start;width:auto;max-width:none;margin:12px 12px 0;background:transparent}
+.side{padding:12px 12px 12px}
+.mhead[hidden]{display:none}
+.scroll{padding:24px 24px 80px}
+/* Labels sit above their icons, so the grid gets the full width. */
+:root{--cell:72px}
+.grp{grid-template-columns:minmax(0,1fr);padding:28px 0 0;border-top:0}
+.grp:first-child{padding-top:0}
+.gh{padding:0 0 6px}
+.gh b{font:500 13px/20px var(--font);color:var(--t2)}
+.gh small{display:inline;margin-left:8px}
+.gh b,.gh small{display:inline}
+/* A tile that also has a filled drawing carries one quiet dot. */
+.t[data-alt]::after{content:"";position:absolute;left:calc(50% + 15px);top:calc(50% + 13px);width:4px;height:4px;border-radius:50%;background:var(--t4);transition:background-color .16s}
+.t[data-alt]:hover::after{background:var(--t3)}
+.t.sel::after{opacity:0}
+/* Footer row: social links on the left, appearance on the right. */
+.social-links{justify-self:start;gap:12px;margin:8px 0 12px 24px}
+.app>.theme-toggle{grid-area:credit;justify-self:end;align-self:center;margin:8px 13px 12px 0}
+/* Dialog: outline / filled switch under the name, only for symbols that have both. */
+.vseg{position:relative;flex:none;align-self:flex-start;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;margin-top:16px;padding:2px;border-radius:var(--ds-radius-control);background:var(--fill)}
+.vseg[hidden]{display:none}
+.vseg button{position:relative;z-index:1;height:30px;padding:0 14px;border-radius:8px;font:400 13px/16px var(--font);color:var(--t2);transition:color .16s}
+.vseg button:hover{color:var(--ink)}
+.vseg button[aria-checked=true]{color:var(--ink);font-weight:500}
+.vseg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.vseg .ind{position:absolute;top:2px;bottom:2px;left:2px;width:calc(50% - 2px);border-radius:8px;background:var(--pill);box-shadow:var(--pill-sh);transition:transform .24s var(--out)}
+.vseg[data-v=solid] .ind{transform:translateX(100%)}
+@media(prefers-reduced-motion:reduce){.vseg .ind{transition:none}}
+@media(max-width:900px){
+  .app,body.xray .app{grid-template:"find tog" auto "side side" auto "main main" minmax(0,1fr) "credit credit" auto / minmax(0,1fr) auto}
+  .app>.find{margin:8px 0 0 8px}
+  .app>.theme-toggle{grid-area:tog;margin:8px 8px 0 4px}
+  .side{padding:4px 8px 0}
+  .social-links{justify-self:center;margin:4px 16px 8px}
+  .scroll{padding:16px 16px 40px}
+  :root{--cell:64px}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
+  <label class="find" id="find"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m12.5 12.5 4 4"/></svg><input id="q" aria-label="Search all icons" placeholder="Search all icons" autocomplete="off" spellcheck="false"><kbd>/</kbd></label>
   <aside class="side">
     <nav class="nav" id="nav" aria-label="Icon categories"></nav>
     <section class="anat" id="anat" aria-label="Anatomy" aria-live="polite">
@@ -598,9 +640,8 @@ body.leading .stage .keys>g{opacity:1}
   </aside>
 
   <main class="main" aria-label="Icon library">
-    <header class="mhead" id="mhead"><label class="find" id="find"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m12.5 12.5 4 4"/></svg><input id="q" aria-label="Search all icons" placeholder="Search all icons" autocomplete="off" spellcheck="false"><kbd>/</kbd></label><h1 id="h1">General</h1><span id="hn"></span><div class="sp"></div>
-      <div class="mtools"><button class="xr" id="xr" type="button" aria-pressed="false" aria-label="Show components (X)" title="Components  X"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 3H10.3C10.74 3 11.610776 3 12.055388 3.444612C12.5 3.889224 12.5 4.76 12.5 5.2V10.3C12.5 10.74 12.5 11.610776 12.055388 12.055388C11.610776 12.5 10.74 12.5 10.3 12.5H5.2C4.76 12.5 3.889224 12.5 3.444612 12.055388C3 11.610776 3 10.74 3 10.3V5.2C3 4.76 3 3.889224 3.444612 3.444612C3.889224 3 4.76 3 5.2 3Z"/><path d="M7.5 15.2V15.5C7.5 15.8 7.5 16.393711 7.803144 16.696856C8.106289 17 8.7 17 9 17H15C15.3 17 15.893711 17 16.196856 16.696856C16.5 16.393711 16.5 15.8 16.5 15.5V9.5C16.5 9.2 16.5 8.606289 16.196856 8.303144C15.893711 8 15.3 8 15 8H14.7" stroke-dasharray="1.6 2.2"/></svg></button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false"><svg data-appearance width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.25a6.75 6.75 0 0 0 0 13.5Z" fill="currentColor"/></svg></button></div>
-    </header>
+    <h1 id="h1">General</h1>
+    <header class="mhead" id="mhead" hidden><span id="hn"></span><button class="xr" id="xr" type="button" aria-pressed="false" tabindex="-1"></button></header>
     <div class="scroll" id="scroll"><div class="view" id="view"></div></div>
 
   </main>
@@ -612,6 +653,7 @@ body.leading .stage .keys>g{opacity:1}
       <a href="https://x.com/Parker_EV_UX" aria-label="X" title="X" target="_blank" rel="noopener noreferrer">X</a>
       <a href="https://www.xiaohongshu.com/user/profile/59618b7c82ec3953470d5cca" aria-label="Rednote" title="Rednote" target="_blank" rel="noopener noreferrer" class="rednote">Rednote</a>
     </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false"><svg data-appearance width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.25a6.75 6.75 0 0 0 0 13.5Z" fill="currentColor"/></svg></button>
 </div>
 
 <div class="tcap" id="tcap" aria-hidden="true"></div>
@@ -627,6 +669,7 @@ body.leading .stage .keys>g{opacity:1}
       <button class="rb" id="close" aria-label="Close"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M14 14L34 34M34 14L14 34"/></svg></button>
     </div>
     <div class="ihead"><div class="iname" id="iname" tabindex="-1"></div><div class="ipath" id="ipath"></div></div>
+    <div class="vseg" id="vseg" role="radiogroup" aria-label="Style" hidden><span class="ind"></span><button type="button" role="radio" data-v="line" aria-checked="true">Outline</button><button type="button" role="radio" data-v="solid" aria-checked="false">Filled</button></div>
     <svg class="tree" id="tree" aria-hidden="true"></svg>
     <h2 class="relation-label" id="relation-label" hidden></h2>
     <section class="asm" id="part-links" aria-labelledby="relation-label" hidden></section>
@@ -1149,6 +1192,9 @@ const ABBR={lb:'left-back',lf:'left-front',rb:'right-back',rf:'right-front','2br
 const $=s=>document.querySelector(s);
 const by={};
 ICONS.forEach((o,i)=>{const b=o.n.split('/')[1];o.b=b;o.i=i;const w=b.split('_').map(x=>ABBR[x]||x);o.title=o.t||w.join(' ').replace(/^./,c=>c.toUpperCase());o.hay=[o.n,o.title,o.g,CT[o.c].t,o.a].join(' ').toLowerCase();by[o.n]=o;});
+// Outline and filled drawings of one symbol share a tile; the dialog switches between them.
+ICONS.forEach(o=>{if(o.c==='part')return;const m=o.n.match(/^(.*)_(fill|filled)$/),line=m&&by[m[1]];if(line&&line.c===o.c){line.solid=o.n;o.lineOf=line.n;line.hay+=' filled solid '+o.hay;}});
+const listed=o=>!o.lineOf;
 // STATE-01: shared 45° strike, 2 px stroke and 2 px clear space on each side.
 function offBody(base,slash){
   return `<defs><mask id="state-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48"><rect width="48" height="48" fill="white"/><path d="M0 0L48 48" stroke="black" stroke-width="6"/></mask></defs><g mask="url(#state-gap)">${base}</g>${slash}`;
@@ -1984,7 +2030,7 @@ function slide(el,axis,from,to,ms=380){
 }
 /* nav */
 const groupsOf=k=>[...new Set(ICONS.filter(o=>o.c===k).map(o=>o.g))];
-$('#nav').innerHTML=CATS.filter(c=>c.k!=='part').map(c=>`<button class="it" data-c="${c.k}"><span>${c.t}</span><em>${ICONS.filter(o=>o.c===c.k).length}</em></button>`).join('');
+$('#nav').innerHTML=CATS.filter(c=>c.k!=='part').map(c=>`<button class="it" data-c="${c.k}"><span>${c.t}</span><em>${ICONS.filter(o=>o.c===c.k&&listed(o)).length}</em></button>`).join('');
 const navind=document.createElement('span');navind.className='navind';$('#nav').prepend(navind);
 const categoryNav=$('#nav');
 function updateNavFade(){
@@ -2024,7 +2070,7 @@ $('#nav').addEventListener('click',e=>{const it=e.target.closest('.it');if(it){i
 let list=[];
 function rows(L,showCat){const gs=[...new Set(L.map(o=>o.c+'|'+o.g))];let i=0;
   return gs.map(key=>{const [c,g]=key.split('|');const G=L.filter(o=>o.c===c&&o.g===g);
-    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}" aria-label="${o.title}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
+    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}"${o.solid?' data-alt=""':''} aria-label="${o.title}${o.solid?', outline and filled':''}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
 const PANES={};const V=$('#view');
 function pane(k){if(!PANES[k]){const d=document.createElement('div');d.className='pane';d.dataset.k=k;V.appendChild(d);PANES[k]=d;}return PANES[k];}
 function AP(){return V.querySelector('.pane.on')||V;}
@@ -2043,12 +2089,12 @@ function swapTo(k,title,count){const nx=pane(k);queueMicrotask(()=>applyX(xFocus
   nx.getAnimations().forEach(a=>a.cancel());nx.classList.add('on');$('#scroll').scrollTop=0;
   nx.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:320,delay:old?60:0,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});}
 function show(k){P.cat=k;save();document.querySelectorAll('.it').forEach(b=>{const active=b.dataset.c===k;b.classList.toggle('on',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});moveNav();
-  list=ICONS.filter(o=>o.c===k);const n=list.length;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(P.cat===k&&!q.value.trim())swapTo(k,CT[k].t,n)}));}
+  list=ICONS.filter(o=>o.c===k&&listed(o));const n=list.length;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(P.cat===k&&!q.value.trim())swapTo(k,CT[k].t,n)}));}
 const q=$('#q');let qt;
 q.addEventListener('input',()=>{$('#find').classList.toggle('has',!!q.value.trim());clearTimeout(qt);qt=setTimeout(search,90)});
 function search(){const v=q.value.trim().toLowerCase();if(!v){show(P.cat);return;}
   document.querySelectorAll('.it').forEach(b=>{b.classList.remove('on');b.removeAttribute('aria-current');});moveNav();
-  const ts=v.split(/\s+/);list=ICONS.filter(o=>o.c!=='part'&&ts.every(t=>o.hay.includes(t)));
+  const ts=v.split(/\s+/);list=ICONS.filter(o=>o.c!=='part'&&listed(o)&&ts.every(t=>o.hay.includes(t)));
   const sp=pane('_q');sp.innerHTML=list.length?rows(list,true).replace(/ class="t enter/g,' class="t'):noneHTML(v);if(curK==='_q'){$('#h1').textContent='Results';$('#hn').textContent=list.length;applyX(xFocus());}else swapTo('_q','Results',list.length);}
 function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;const d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];}
 function noneHTML(v){const words=[...new Set(ICONS.flatMap(o=>o.title.toLowerCase().split(' ')))].filter(w=>w.length>2);
@@ -2108,8 +2154,8 @@ function applyX(p){
     else{if(t.dataset.x){ic.outerHTML=svg(by[n]);delete t.dataset.x;}t.classList.toggle('dim',!!p);}
   });
   document.querySelectorAll('.it').forEach(b=>{
-    const k=b.dataset.c,all=ICONS.filter(o=>o.c===k);
-    const n=p?all.filter(o=>users.has(o.n)).length:all.length;
+    const k=b.dataset.c,all=ICONS.filter(o=>o.c===k&&listed(o));
+    const n=p?all.filter(o=>users.has(o.n)||users.has(o.solid)).length:all.length;
     b.querySelector('em').textContent=n;b.classList.toggle('zero',!!p&&!n);
   });
   anatButtons();
@@ -2197,7 +2243,10 @@ function inspectorLinks(o){
 }
 function fill(o,keepFocus,preserveDrawing=false){
   $('#crumb').textContent=`${CT[o.c].t} / ${o.g}`;
-  $('#iname').textContent=o.title;
+  const line=o.lineOf?by[o.lineOf]:o;
+  $('#iname').textContent=line.title;
+  vseg.hidden=!line.solid;vseg.dataset.v=o.lineOf?'solid':'line';
+  vseg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===vseg.dataset.v)));
   $('#ipath').innerHTML=`<span>${o.n}</span>`+RULE(o).map(r=>`<span class="r">${r}</span>`).join('');
   if(!preserveDrawing||big.dataset.n!==o.n)setBig(o.n,keepFocus);
   const asm=$('#part-links'),{names,kind,part}=inspectorLinks(o);
@@ -2215,7 +2264,7 @@ function fill(o,keepFocus,preserveDrawing=false){
   requestAnimationFrame(()=>placeSz(false));
   resetSvgCopy();
 }
-const sheet=$('#sheet'),veil=$('#veil');
+const sheet=$('#sheet'),veil=$('#veil'),vseg=$('#vseg');
 const stage=$('#stage'),grid=$('#keys'),details=$('.sr'),app=$('.app');
 const lensReduced=matchMedia('(prefers-reduced-motion: reduce)'),lensCompact=matchMedia('(max-width:620px)');
 const lensEase='cubic-bezier(.32,.72,0,1)';
@@ -2333,7 +2382,7 @@ function closeInsp(){
   freezeCopyForClose();
   sheet.getAnimations({subtree:true}).filter(a=>!lensMotion.includes(a)).forEach(a=>a.pause());
   if(lensReduced.matches){finishLens();return;}
-  const source=sourceFor(sel,lensAnchor)||sourceFor(sel,selectedTile(sel));
+  const tileName=by[sel]?.lineOf||sel,source=sourceFor(tileName,lensAnchor)||sourceFor(tileName,selectedTile(tileName));
   const currentSheet=sheet.getBoundingClientRect(),currentArt=stage.getBoundingClientRect();
   const backdrop=Number(getComputedStyle(veil).opacity),sheetOpacity=Number(getComputedStyle(sheet).opacity);
   const surfaceOpacity=Number(getComputedStyle(sheet).getPropertyValue('--dialog-surface-opacity'));
@@ -2638,6 +2687,14 @@ function go(n,{back=false,instant=false}={}){
 }
 asmEl.addEventListener('click',e=>{const b=e.target.closest('#sizes button');if(!b)return;P.px=+b.dataset.v;save();$('#sizes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));placeSz(true);});
 details.prepend($('#back'));
+// Style switch: same symbol, so the drawing swaps in place without zooming (5.4).
+vseg.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-v]');if(!b||lensState!=='open'||!by[sel])return;
+  const line=by[sel].lineOf?by[by[sel].lineOf]:by[sel],n=b.dataset.v==='solid'?line.solid:line.n;
+  if(!n||n===sel)return;
+  clearMorph();clearTimeout(previewT);preview=null;focusPart(null);say('');
+  sel=n;markTile(selectedTile(line.n));blendBig(by[n],lensReduced.matches);layoutLeads();
+});
 $('#back').onclick=e=>{if(trail.length)go(trail.pop(),{back:true,instant:e.detail===0});};
 function hoverTile(b){
   if(lensState!=='open')return;
@@ -2837,7 +2894,7 @@ addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(typing){if(q.value){q.value='';$('#find').classList.remove('has');search()}else q.blur()}return;}
 });
 
-Object.keys(CT).filter(k=>k!=='part').forEach(k=>{pane(k).innerHTML=rows(ICONS.filter(o=>o.c===k)).replace(/ class="t enter/g,' class="t')});
+Object.keys(CT).filter(k=>k!=='part').forEach(k=>{pane(k).innerHTML=rows(ICONS.filter(o=>o.c===k&&listed(o))).replace(/ class="t enter/g,' class="t')});
 show(CT[P.cat]&&P.cat!=='part'?P.cat:'general');applyTheme();setXray(false,true);
 </script>
 </body>
