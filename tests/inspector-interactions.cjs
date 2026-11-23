@@ -1,6 +1,6 @@
 const pw=require('playwright'),assert=require('assert'),fs=require('fs');
 (async()=>{const report={};for(const engine of ['chromium','webkit','firefox']){const b=await pw[engine].launch(),p=await b.newPage({viewport:{width:1280,height:900}});await p.goto((process.env.DASHLINE_URL||'http://127.0.0.1:8864'));
-const search=p.getByRole('textbox',{name:'Search icons'});
+const search=p.getByRole('textbox',{name:'Search all icons',exact:true});
 const vehicle=p.locator('.it[data-c="vehicle"]');
 const vehiclePane=p.locator('.pane.on[data-k="vehicle"]');
 const searchPane=p.locator('.pane.on[data-k="_q"]');
@@ -65,7 +65,7 @@ assert.match(await p.evaluate(()=>window.__copiedSvg),/<path\b/);
 assert.doesNotMatch(await p.evaluate(()=>window.__copiedSvg),/<mask\b/);
 await p.locator('#back').press('Enter');
 assert.equal(await p.locator('#iname').textContent(),'Battery full charging');
-await open('general/bluetooth');assert.equal(await p.locator('#part-links button').count(),0);assert.equal(await p.locator('#relation-label').isVisible(),false);
+await open('general/bluetooth');assert.equal(await p.locator('#part-links button').count(),1);assert.equal(await p.locator('#relation-label').isVisible(),true);assert.equal(await p.locator('#relation-label').innerText(),'Parts');
 await open('general/mic_off');const slash=await p.evaluate(()=>inspection(sel).entries.find(n=>by[n].originPart==='part/off_slash'));await p.locator(`[data-inspect="${slash}"]`).click();await p.waitForTimeout(330);assert.equal(await p.locator('#part-links').getAttribute('data-kind'),'uses');assert.equal(await p.locator('#part-links [data-inspect="general/mic_off"]').count(),1);
 await open('vehicle/fast_charge');const bolt=await p.evaluate(()=>inspection(sel).entries.find(n=>by[n].originPart==='part/bolt'));assert.ok(bolt);await p.locator(`[data-inspect="${bolt}"]`).click();await p.waitForTimeout(330);
 for(const n of ['status/battery_full_charging','status/battery_mid_charging','vehicle/fast_charge'])assert.equal(await p.locator(`#part-links [data-inspect="${n}"]`).count(),1);
