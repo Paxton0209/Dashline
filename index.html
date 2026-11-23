@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>try{const s=JSON.parse(localStorage.getItem('dsi4')||'{}'),k=s.scheme||(s.darkMode===true?'dark':null);document.documentElement.dataset.theme=k||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashline</title>
@@ -606,7 +607,8 @@ body.leading .stage .keys>g{opacity:1}
 .app>.theme-toggle{transition:background-color .4s,color 160ms,opacity 150ms,scale 110ms ease-out}
 .grp{padding-top:16px}
 .grp:first-child{padding-top:0}
-.app>.theme-toggle:hover{background:var(--panel)}
+.app>.theme-toggle{color:var(--t3)}
+.app>.theme-toggle:hover,.app>.theme-toggle:focus-visible{background:var(--panel);color:var(--ink)}
 /* Search is a field: recessed, so it never reads like the raised selected category. */
 .app>.find{height:36px;border-color:transparent;background:var(--fill)}
 .app>.find:focus-within{background:var(--fill);border-color:var(--accent)}
@@ -1971,29 +1973,34 @@ document.querySelectorAll('[data-ic]').forEach(e=>setIc(e,e.dataset.ic));
 
 
 /* prefs */
-let P={darkMode:false,px:24,cat:'general',xray:false};
+let P={scheme:null,px:24,cat:'general',xray:false};
 try{
   const saved=JSON.parse(localStorage.getItem('dsi4')||'{}');
-  P={darkMode:saved.darkMode===true,px:saved.px??P.px,cat:saved.cat&&saved.cat!=='part'?saved.cat:'general',xray:saved.xray===true};
+  // scheme: null follows the system; 'light' / 'dark' is a temporary override. Old saves only pinned dark on purpose.
+  P={scheme:saved.scheme==='light'||saved.scheme==='dark'?saved.scheme:saved.darkMode===true?'dark':null,px:saved.px??P.px,cat:saved.cat&&saved.cat!=='part'?saved.cat:'general',xray:saved.xray===true};
 }catch(e){}
 const save=()=>{try{localStorage.setItem('dsi4',JSON.stringify(P))}catch(e){}};
 const darkSwitch=$('#theme-toggle');
+const systemDark=matchMedia('(prefers-color-scheme: dark)');
+const isDarkNow=()=>P.scheme?P.scheme==='dark':systemDark.matches;
 function applyTheme(){
-  const isDark=P.darkMode===true;
+  const isDark=isDarkNow();
   document.documentElement.dataset.theme=isDark?'dark':'light';
   darkSwitch.title=isDark?'Switch to light theme':'Switch to dark theme';
   darkSwitch.setAttribute('aria-label',darkSwitch.title);
   darkSwitch.setAttribute('aria-pressed',String(isDark));
 }
-let requestedDark=P.darkMode;
-let changingTheme=false;
+// Two-state toggle over three stored states: a choice that matches the system clears the override.
 function setTheme(dark){
-  P.darkMode=dark;
+  P.scheme=dark===systemDark.matches?null:dark?'dark':'light';
   applyTheme();
   save();
 }
+systemDark.addEventListener('change',()=>{if(!P.scheme)applyTheme();});
+let requestedDark=isDarkNow();
+let changingTheme=false;
 async function toggleTheme(){
-  requestedDark=!requestedDark;
+  requestedDark=changingTheme?!requestedDark:!isDarkNow();
   if(changingTheme)return;
   const root=document.documentElement;
   if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){
@@ -2002,7 +2009,7 @@ async function toggleTheme(){
   }
   changingTheme=true;
   try{
-    while(P.darkMode!==requestedDark){
+    while(isDarkNow()!==requestedDark){
       const dark=requestedDark;
       const bounds=darkSwitch.getBoundingClientRect();
       const x=bounds.left+bounds.width/2;
@@ -2018,7 +2025,7 @@ async function toggleTheme(){
         await transition.ready;
         await transition.finished;
       }catch{
-        if(P.darkMode!==dark)setTheme(dark);
+        if(isDarkNow()!==dark)setTheme(dark);
       }finally{
         if(transition)await transition.finished.catch(()=>{});
         root.classList.remove('theme-changing');
