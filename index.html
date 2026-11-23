@@ -598,17 +598,30 @@ body.leading .stage .keys>g{opacity:1}
 .gh b{font:500 13px/20px var(--font);color:var(--t2)}
 .gh small{display:inline;margin-left:8px}
 .gh b,.gh small{display:inline}
-/* A tile that also has a filled drawing carries one quiet dot. */
-.t[data-alt]::after{content:"";position:absolute;left:calc(50% + 15px);top:calc(50% + 13px);width:4px;height:4px;border-radius:50%;background:var(--t4);transition:background-color .16s}
-.t[data-alt]:hover::after{background:var(--t3)}
-.t.sel::after{opacity:0}
-/* Footer row: social links on the left, appearance on the right. */
-.social-links{justify-self:start;gap:12px;margin:8px 0 12px 24px}
-.app>.theme-toggle{grid-area:credit;justify-self:end;align-self:center;margin:8px 13px 12px 0}
+/* Appearance belongs to the page, not to navigation: it sits in the panel's top-right corner. */
+.app>.theme-toggle{grid-area:main;justify-self:end;align-self:start;position:relative;z-index:3;margin:20px 25px 0 0;background:var(--panel)}
+/* Group labels stick to the top of the panel; the appearance button lives at the right end of that row. */
+.scroll{padding-top:0;mask-image:linear-gradient(to bottom,#000 calc(100% - var(--library-fade-bottom,0px)),transparent)}
+.gh{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:56px;padding:0;margin-bottom:-6px;background:var(--panel)}
+.grp{padding-top:16px}
+.grp:first-child{padding-top:0}
+.app>.theme-toggle:hover{background:var(--panel)}
+/* Search is a field: recessed, so it never reads like the raised selected category. */
+.app>.find{height:36px;border-color:transparent;background:var(--fill)}
+.app>.find:focus-within{background:var(--fill);border-color:var(--accent)}
+.app>.find kbd{background:var(--fill2)}
+/* Search and categories are different things: their gap matches the panel inset, well beyond the 2px between categories. */
+.side{padding-top:24px}
 /* Dialog: outline / filled switch under the name, only for symbols that have both. */
-.vseg{position:relative;flex:none;align-self:flex-start;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;margin-top:16px;padding:2px;border-radius:var(--ds-radius-control);background:var(--fill)}
+.ihead{display:flex;align-items:center;gap:12px;min-height:52px}
+.ihead{padding-top:18px}
+.ihead .iname{flex:1;min-width:0;margin-top:0}
+/* Same title row height and top in both pages, so the relation list never shifts on entry or return. */
+.sheet.trail .ihead{margin-top:0}
+@media(max-width:620px),(max-height:520px){.ihead{margin-top:28px}.sheet.trail .ihead{margin-top:0}}
+.vseg{position:relative;flex:none;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:2px;border-radius:var(--ds-radius-control);background:var(--fill)}
 .vseg[hidden]{display:none}
-.vseg button{position:relative;z-index:1;height:30px;padding:0 14px;border-radius:8px;font:400 13px/16px var(--font);color:var(--t2);transition:color .16s}
+.vseg button{position:relative;z-index:1;height:30px;padding:0 12px;border-radius:8px;font:400 13px/16px var(--font);color:var(--t2);transition:color .16s}
 .vseg button:hover{color:var(--ink)}
 .vseg button[aria-checked=true]{color:var(--ink);font-weight:500}
 .vseg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
@@ -616,12 +629,13 @@ body.leading .stage .keys>g{opacity:1}
 .vseg[data-v=solid] .ind{transform:translateX(100%)}
 @media(prefers-reduced-motion:reduce){.vseg .ind{transition:none}}
 @media(max-width:900px){
-  .app,body.xray .app{grid-template:"find tog" auto "side side" auto "main main" minmax(0,1fr) "credit credit" auto / minmax(0,1fr) auto}
-  .app>.find{margin:8px 0 0 8px}
-  .app>.theme-toggle{grid-area:tog;margin:8px 8px 0 4px}
-  .side{padding:4px 8px 0}
-  .social-links{justify-self:center;margin:4px 16px 8px}
-  .scroll{padding:16px 16px 40px}
+  .app,body.xray .app{grid-template:"find" auto "side" auto "main" minmax(0,1fr) "credit" auto / minmax(0,1fr)}
+  .app>.find{margin:8px 8px 0}
+  .app>.theme-toggle{margin:12px 13px 0 0}
+  .gh{height:48px}
+  .side{padding:8px 8px 0}
+  .social-links{margin:4px 16px 8px}
+  .scroll{padding:0 16px 40px}
   :root{--cell:64px}
 }
 
@@ -668,8 +682,7 @@ body.leading .stage .keys>g{opacity:1}
     <div class="iph" id="iph"><button class="back" id="back" type="button"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5L7 10L12 15"/></svg><span id="backname"></span></button><div class="crumb" id="crumb"></div><span class="grow"></span>
       <button class="rb" id="close" aria-label="Close"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M14 14L34 34M34 14L14 34"/></svg></button>
     </div>
-    <div class="ihead"><div class="iname" id="iname" tabindex="-1"></div><div class="ipath" id="ipath"></div></div>
-    <div class="vseg" id="vseg" role="radiogroup" aria-label="Style" hidden><span class="ind"></span><button type="button" role="radio" data-v="line" aria-checked="true">Outline</button><button type="button" role="radio" data-v="solid" aria-checked="false">Filled</button></div>
+    <div class="ihead"><div class="iname" id="iname" tabindex="-1"></div><div class="vseg" id="vseg" role="radiogroup" aria-label="Style" hidden><span class="ind"></span><button type="button" role="radio" data-v="line" aria-checked="true">Outline</button><button type="button" role="radio" data-v="solid" aria-checked="false">Filled</button></div><div class="ipath" id="ipath"></div></div>
     <svg class="tree" id="tree" aria-hidden="true"></svg>
     <h2 class="relation-label" id="relation-label" hidden></h2>
     <section class="asm" id="part-links" aria-labelledby="relation-label" hidden></section>
@@ -1195,6 +1208,7 @@ ICONS.forEach((o,i)=>{const b=o.n.split('/')[1];o.b=b;o.i=i;const w=b.split('_')
 // Outline and filled drawings of one symbol share a tile; the dialog switches between them.
 ICONS.forEach(o=>{if(o.c==='part')return;const m=o.n.match(/^(.*)_(fill|filled)$/),line=m&&by[m[1]];if(line&&line.c===o.c){line.solid=o.n;o.lineOf=line.n;line.hay+=' filled solid '+o.hay;}});
 const listed=o=>!o.lineOf;
+const titleOf=n=>by[by[n].lineOf]?.title||by[n].title;
 // STATE-01: shared 45° strike, 2 px stroke and 2 px clear space on each side.
 function offBody(base,slash){
   return `<defs><mask id="state-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48"><rect width="48" height="48" fill="white"/><path d="M0 0L48 48" stroke="black" stroke-width="6"/></mask></defs><g mask="url(#state-gap)">${base}</g>${slash}`;
@@ -2070,7 +2084,7 @@ $('#nav').addEventListener('click',e=>{const it=e.target.closest('.it');if(it){i
 let list=[];
 function rows(L,showCat){const gs=[...new Set(L.map(o=>o.c+'|'+o.g))];let i=0;
   return gs.map(key=>{const [c,g]=key.split('|');const G=L.filter(o=>o.c===c&&o.g===g);
-    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}"${o.solid?' data-alt=""':''} aria-label="${o.title}${o.solid?', outline and filled':''}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
+    return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}" aria-label="${o.title}${o.solid?', outline and filled':''}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
 const PANES={};const V=$('#view');
 function pane(k){if(!PANES[k]){const d=document.createElement('div');d.className='pane';d.dataset.k=k;V.appendChild(d);PANES[k]=d;}return PANES[k];}
 function AP(){return V.querySelector('.pane.on')||V;}
@@ -2245,7 +2259,9 @@ function fill(o,keepFocus,preserveDrawing=false){
   $('#crumb').textContent=`${CT[o.c].t} / ${o.g}`;
   const line=o.lineOf?by[o.lineOf]:o;
   $('#iname').textContent=line.title;
+  const segBack=vseg.hidden&&!!line.solid&&lensState==='open';
   vseg.hidden=!line.solid;vseg.dataset.v=o.lineOf?'solid':'line';
+  if(segBack&&!lensReduced.matches)vseg.animate([{opacity:0},{opacity:1}],{duration:180,delay:60,easing:'cubic-bezier(0,0,.58,1)',fill:'backwards'});
   vseg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===vseg.dataset.v)));
   $('#ipath').innerHTML=`<span>${o.n}</span>`+RULE(o).map(r=>`<span class="r">${r}</span>`).join('');
   if(!preserveDrawing||big.dataset.n!==o.n)setBig(o.n,keepFocus);
@@ -2523,7 +2539,7 @@ function ghostOf(){
   stage.append(g);return g;
 }
 const trail=[];
-function updateBack(){sheet.classList.toggle('trail',!!trail.length);$('#backname').textContent=trail.length?by[trail.at(-1)].title:'';}
+function updateBack(){sheet.classList.toggle('trail',!!trail.length);$('#backname').textContent=trail.length?titleOf(trail.at(-1)):'';}
 let hoverLock=false;
 
 // Match labels by content so the existing name becomes the back label continuously.
