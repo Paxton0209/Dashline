@@ -2683,7 +2683,7 @@ function sameAspect(a,b){
 // uncovering the outline. Copies carry the motion, so masked drawings (the car) keep repainting; the live drawing waits.
 // Paced by area, not radius: the covered area follows a smoothstep, so the radius is sqrt(smoothstep(t)).
 // The fill grows evenly and settles at the end instead of bursting outward in the middle.
-const REVEAL_MS=520,REVEAL_EASE='linear(0, 0.106 6.25%, 0.207 12.5%, 0.304 18.75%, 0.395 25%, 0.482 31.25%, 0.562 37.5%, 0.638 43.75%, 0.707 50%, 0.77 56.25%, 0.827 62.5%, 0.876 68.75%, 0.919 75%, 0.953 81.25%, 0.978 87.5%, 0.994 93.75%, 1)';
+const REVEAL_MS=420,REVEAL_EASE='linear(0, 0.106 6.25%, 0.207 12.5%, 0.304 18.75%, 0.395 25%, 0.482 31.25%, 0.562 37.5%, 0.638 43.75%, 0.707 50%, 0.77 56.25%, 0.827 62.5%, 0.876 68.75%, 0.919 75%, 0.953 81.25%, 0.978 87.5%, 0.994 93.75%, 1)';
 function revealVariant(o,toSolid,still){
   if(still){fill(o);return;}
   const from=ghostOf();fill(o);
