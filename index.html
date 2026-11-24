@@ -1556,11 +1556,12 @@ const partVariants={
   'part/direction_arrow:adjust_sync':straightArrow(24.14,20.13,8,1.95,{double:true}),
   'part/curved_airflow_arrow:seat':curvedAirflowArrow('M6.4 37.4V35.8Q6.4 24 21 24H32'),
   'part/play_triangle:solid':playbackTriangle(by['part/play_triangle'].s,true),
+  // Open up the handset's inner curve while keeping its outer size aligned with the outline.
+  'part/phone:filled':'<path d="M14.905 10.5H17.35L20.1 16.65L16.85 19.9C18.35 24.52 23.4937 29.6637 28.1137 31.1637L31.3637 27.9137L37.5137 30.6637V33.1087C37.5137 35.7174 35.3398 37.8913 32.7311 37.4565C21.8615 35.7174 12.2963 26.1522 10.5571 15.2826C10.1224 12.6739 12.2963 10.5 14.905 10.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   // Energy line pair: the shared bolt's six vertices and path order, opened up for standalone use at 1.7x:
   // x scaled 1.25 about the centre and the waist band raised from 2 to 3.6, so a 2 px outline keeps room inside.
   // Outline stroke is normalised to 2 px; the solid's rounding stroke is part of its silhouette (not normalised),
   // so it is 2/1.7 here: its outer edge then matches the outline's outer edge, as with lock / lock_fill.
-  'part/phone:filled':solidOf(by['part/phone'].s),
   'part/bolt:line':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
   'part/bolt:solid':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" fill="currentColor"/><path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="1.176471" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
   // Filled ego car: the whole body is solid (silhouette = outline's outer edge, mirrors unchanged);
@@ -1994,11 +1995,11 @@ document.querySelectorAll('[data-ic]').forEach(e=>setIc(e,e.dataset.ic));
 
 
 /* prefs */
-let P={scheme:null,px:24,cat:'general',xray:false};
+let P={scheme:null,px:24,xray:false};
 try{
   const saved=JSON.parse(localStorage.getItem('dsi4')||'{}');
   // scheme: null follows the system; 'light' / 'dark' is a temporary override. Old saves only pinned dark on purpose.
-  P={scheme:saved.scheme==='light'||saved.scheme==='dark'?saved.scheme:saved.darkMode===true?'dark':null,px:saved.px??P.px,cat:saved.cat&&saved.cat!=='part'?saved.cat:'general',xray:saved.xray===true};
+  P={scheme:saved.scheme==='light'||saved.scheme==='dark'?saved.scheme:saved.darkMode===true?'dark':null,px:saved.px??P.px,xray:saved.xray===true};
 }catch(e){}
 const save=()=>{try{localStorage.setItem('dsi4',JSON.stringify(P))}catch(e){}};
 const systemDark=matchMedia('(prefers-color-scheme: dark)');
@@ -2106,6 +2107,7 @@ $('#nav').addEventListener('click',e=>{const it=e.target.closest('.it');if(it){i
 
 /* render */
 let list=[];
+let activeCategory='general';
 function rows(L,showCat){const gs=[...new Set(L.map(o=>o.c+'|'+o.g))];let i=0;
   return gs.map(key=>{const [c,g]=key.split('|');const G=L.filter(o=>o.c===c&&o.g===g);
     return `<div class="grp" data-g="${g}"><div class="gh"><b>${g}</b>${showCat?`<small>${CT[c].t}</small>`:''}</div><div class="tiles">${G.map(o=>`<button class="t enter${sel===o.n?' sel':''}" style="--i:${Math.min(i++,48)}" data-n="${o.n}" aria-label="${o.title}${o.solid?', outline and filled':''}">${svg(o)}</button>`).join('')}</div></div>`}).join('');}
@@ -2126,11 +2128,11 @@ function swapTo(k,title,count){const nx=pane(k);queueMicrotask(()=>applyX(xFocus
     outT=setTimeout(()=>{old.classList.remove('out');old.getAnimations().forEach(a=>a.cancel())},150);}
   nx.getAnimations().forEach(a=>a.cancel());nx.classList.add('on');$('#scroll').scrollTop=0;
   nx.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:320,delay:old?60:0,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});}
-function show(k){P.cat=k;save();document.querySelectorAll('.it').forEach(b=>{const active=b.dataset.c===k;b.classList.toggle('on',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});moveNav();
-  list=ICONS.filter(o=>o.c===k&&listed(o));const n=list.length;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(P.cat===k&&!q.value.trim())swapTo(k,CT[k].t,n)}));}
+function show(k){activeCategory=k;document.querySelectorAll('.it').forEach(b=>{const active=b.dataset.c===k;b.classList.toggle('on',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});moveNav();
+  list=ICONS.filter(o=>o.c===k&&listed(o));const n=list.length;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(activeCategory===k&&!q.value.trim())swapTo(k,CT[k].t,n)}));}
 const q=$('#q');let qt;
 q.addEventListener('input',()=>{$('#find').classList.toggle('has',!!q.value.trim());clearTimeout(qt);qt=setTimeout(search,90)});
-function search(){const v=q.value.trim().toLowerCase();if(!v){show(P.cat);return;}
+function search(){const v=q.value.trim().toLowerCase();if(!v){show(activeCategory);return;}
   document.querySelectorAll('.it').forEach(b=>{b.classList.remove('on');b.removeAttribute('aria-current');});moveNav();
   const ts=v.split(/\s+/);list=ICONS.filter(o=>o.c!=='part'&&listed(o)&&ts.every(t=>o.hay.includes(t)));
   const sp=pane('_q');sp.innerHTML=list.length?rows(list,true).replace(/ class="t enter/g,' class="t'):noneHTML(v);if(curK==='_q'){$('#h1').textContent='Results';$('#hn').textContent=list.length;applyX(xFocus());}else swapTo('_q','Results',list.length);}
@@ -2976,7 +2978,7 @@ addEventListener('keydown',e=>{
 });
 
 Object.keys(CT).filter(k=>k!=='part').forEach(k=>{pane(k).innerHTML=rows(ICONS.filter(o=>o.c===k&&listed(o))).replace(/ class="t enter/g,' class="t')});
-show(CT[P.cat]&&P.cat!=='part'?P.cat:'general');applyTheme();setXray(false,true);
+show(activeCategory);applyTheme();setXray(false,true);
 </script>
 </body>
 </html>

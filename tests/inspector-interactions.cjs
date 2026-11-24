@@ -1,5 +1,15 @@
 const pw=require('playwright'),assert=require('assert'),fs=require('fs');
-(async()=>{const report={};for(const engine of ['chromium','webkit','firefox']){const b=await pw[engine].launch(),p=await b.newPage({viewport:{width:1280,height:900}});await p.goto((process.env.DASHLINE_URL||'http://127.0.0.1:8864'));
+(async()=>{const report={};for(const engine of ['chromium','webkit','firefox']){const b=await pw[engine].launch(),p=await b.newPage({viewport:{width:1280,height:900}});
+const url=process.env.DASHLINE_URL||'http://127.0.0.1:8864';
+await p.goto(url);
+await p.evaluate(()=>localStorage.setItem('dsi4',JSON.stringify({cat:'vehicle',scheme:'dark',px:32})));
+await p.reload();
+const generalPane=p.locator('.pane.on[data-k="general"]');
+await generalPane.waitFor();
+assert.equal(await p.locator('#h1').textContent(),'General');
+assert.equal(await p.locator('.it[data-c="general"]').getAttribute('aria-current'),'page');
+assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('dsi4')).px),32);
 const search=p.getByRole('textbox',{name:'Search all icons',exact:true});
 const vehicle=p.locator('.it[data-c="vehicle"]');
 const vehiclePane=p.locator('.pane.on[data-k="vehicle"]');
@@ -19,6 +29,8 @@ for(const whitespace of ['   ','\u3000']){
   assert.equal(await p.locator('#find kbd').isVisible(),true);
 }
 await search.press('Escape');
+await p.reload();
+await generalPane.waitFor();
 await p.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedSvg=text;}}}));
 const open=async n=>p.evaluate(n=>{clearMorph();finishLens();select(n);stopLens();lensState='open';},n);
 await open('general/swap');assert.equal(await p.locator('#relation-label').textContent(),'Parts');assert.equal(await p.locator('#part-links button').count(),2);
