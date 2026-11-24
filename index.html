@@ -586,7 +586,7 @@ body.leading .stage .keys>g{opacity:1}
 }
 
 /* ---- Layout trial: search heads the sidebar column; no toolbar row in the panel ---- */
-.app,body.xray .app{grid-template:"find main" auto "side main" minmax(0,1fr) "credit main" auto / 260px minmax(0,1fr)}
+.app,body.xray .app{grid-template:"find main" auto "side main" minmax(0,1fr) "tog main" auto "credit main" auto / 260px minmax(0,1fr)}
 .app>.find{grid-area:find;align-self:start;width:auto;max-width:none;margin:12px 12px 0;background:transparent}
 .side{padding:12px 12px 12px}
 .mhead[hidden]{display:none}
@@ -600,7 +600,8 @@ body.leading .stage .keys>g{opacity:1}
 .gh small{display:inline;margin-left:8px}
 .gh b,.gh small{display:inline}
 /* Appearance belongs to the page, not to navigation: it sits in the panel's top-right corner. */
-.app>.theme-toggle{grid-area:main;justify-self:end;align-self:start;position:relative;z-index:3;margin:20px 25px 0 0;background:var(--panel)}
+/* Appearance is a site-level control: last item of the sidebar column, on the search / category left line, apart from the footer links. */
+.app>.theme-toggle{grid-area:tog;justify-self:start;margin:0 0 12px 13px;background:transparent}
 /* Group labels stick to the top of the panel; the appearance button lives at the right end of that row. */
 .scroll{padding-top:0;mask-image:linear-gradient(to bottom,#000 calc(100% - var(--library-fade-bottom,0px)),transparent)}
 .gh{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:56px;padding:0;margin-bottom:-6px;background:var(--panel);transition:background-color .4s}
@@ -608,7 +609,7 @@ body.leading .stage .keys>g{opacity:1}
 .grp{padding-top:16px}
 .grp:first-child{padding-top:0}
 .app>.theme-toggle{color:var(--t3)}
-.app>.theme-toggle:hover,.app>.theme-toggle:focus-visible{background:var(--panel);color:var(--ink)}
+.app>.theme-toggle:hover,.app>.theme-toggle:focus-visible{background:transparent;color:var(--ink)}
 /* Search is a field: recessed, so it never reads like the raised selected category. */
 .app>.find{height:36px;border-color:transparent;background:var(--fill)}
 .app>.find:focus-within{background:var(--fill);border-color:var(--accent)}
@@ -632,9 +633,10 @@ body.leading .stage .keys>g{opacity:1}
 .vseg[data-v=solid] .ind{transform:translateX(100%)}
 @media(prefers-reduced-motion:reduce){.vseg .ind{transition:none}}
 @media(max-width:900px){
-  .app,body.xray .app{grid-template:"find" auto "side" auto "main" minmax(0,1fr) "credit" auto / minmax(0,1fr)}
+  .app,body.xray .app{grid-template:"find tog" auto "side side" auto "main main" minmax(0,1fr) "credit credit" auto / minmax(0,1fr) auto}
   .app>.find{margin:8px 8px 0}
-  .app>.theme-toggle{margin:12px 13px 0 0}
+  .app>.find{margin:8px 0 0 8px}
+  .app>.theme-toggle{align-self:center;margin:8px 8px 0 4px}
   .gh{height:48px}
   .side{padding:8px 8px 0}
   .social-links{margin:4px 16px 8px}
