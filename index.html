@@ -152,6 +152,10 @@ svg.ic{display:block;overflow:visible}
 
 /* DriveScene Studio appearance control and root reveal. */
 @property --theme-reveal-progress{syntax:"<length>";inherits:false;initial-value:0px}
+@property --vr{syntax:"<length>";inherits:false;initial-value:0px}
+.ghost.reveal-new{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),#000 calc(var(--vr) - var(--vf)),transparent var(--vr));mask-image:radial-gradient(circle at var(--vx) var(--vy),#000 calc(var(--vr) - var(--vf)),transparent var(--vr))}
+.ghost.reveal-old-soft{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 var(--vr));mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 var(--vr))}
+.ghost.reveal-old{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 calc(var(--vr) - var(--vf) + .75px));mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 calc(var(--vr) - var(--vf) + .75px))}
 ::view-transition-group(root),::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition{pointer-events:none}
 .theme-changing,.theme-changing *{transition:none!important}
@@ -913,8 +917,8 @@ const ICONS=[
   {"n":"sidebar/nav_line","c":"vehicle","s":"<g transform=\"translate(24.0000 24.0000) scale(0.910000) translate(-24.0000 -24.0000)\"><path d=\"M9.41442 11.9853{{corner:9.41442 11.9853 8.197948 8.775789 11.4809 9.76068}}L37.7925 17.6542{{corner:37.7925 17.6542 42.072758 18.938284 38.0071 20.8161}}L27.7874 25.5363{{corner:27.7874 25.5363 27.391183 25.719302 27.2227 26.1123}}L22.2653 37.6758{{corner:22.2653 37.6758 20.612708 41.530593 19.126 37.6081}}L9.41442 11.9853Z\" stroke-width=\"2.197802\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>","g":"Sections"},
   {"n":"sidebar/driving_line","c":"vehicle","s":"{{part/car_front}}","g":"Sections"},
   {"n":"sidebar/driving_line_fill","c":"vehicle","s":"{{part/car_front:solid}}","g":"Sections"},
-  {"n":"sidebar/energy_line","c":"vehicle","s":"<g transform=\"translate(24 24) scale(1.75) translate(-24 -24)\">{{part/bolt:line}}</g>","g":"Sections"},
-  {"n":"sidebar/energy_line_fill","c":"vehicle","s":"<g transform=\"translate(24 24) scale(1.75) translate(-24 -24)\">{{part/bolt:solid}}</g>","g":"Sections"},
+  {"n":"sidebar/energy_line","c":"vehicle","s":"<g transform=\"translate(24 24) scale(1.7) translate(-24 -24)\">{{part/bolt:line}}</g>","g":"Sections"},
+  {"n":"sidebar/energy_line_fill","c":"vehicle","s":"<g transform=\"translate(24 24) scale(1.7) translate(-24 -24)\">{{part/bolt:solid}}</g>","g":"Sections"},
   {"n":"sidebar/lights_line","c":"vehicle","s":"<g transform=\"translate(24.0000 24.0000) scale(1.134125) translate(-24.0000 -24.0000)\"><path d=\"M22.7456 10.948H24.914M34.2168 23.8097H36.8409M13.7413 23.8097H11.1172M31.2192 16.5694L33.0741 14.7145M16.7386 16.5694L14.8838 14.7145M31.2163 31.047L33.0742 32.9048M16.7416 31.047L14.8838 32.9048M23.979 34.0935V36.6713M21.6402 18.0258V14.8455H26.3171V18.0258C27.6587 18.5685 28.7697 19.5609 29.4599 20.8329C30.15 22.1049 30.3762 23.5774 30.0998 24.9979C29.8233 26.4184 29.0615 27.6985 27.9447 28.6189C26.8279 29.5393 25.4258 30.0427 23.9786 30.0427C22.5315 30.0427 21.1294 29.5393 20.0126 28.6189C18.8958 27.6985 18.1339 26.4184 17.8575 24.9979C17.5811 23.5774 17.8073 22.1049 18.4974 20.8329C19.1876 19.5609 20.2986 18.5685 21.6402 18.0258Z\" stroke-width=\"1.763474\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/></g>","g":"Sections"},
   {"n":"sidebar/service_line","c":"vehicle","s":"<path d=\"M36.6765 31.2333L33.0048 27.554C32.8831 27.4399 32.8527 27.2651 32.9212 27.113C33.1796 26.5505 33.3849 25.9651 33.5445 25.3722C34.5708 21.518 33.5749 17.238 30.5493 14.2124C27.5237 11.1868 23.2438 10.191 19.3896 11.2249C18.6978 11.3921 18.4469 11.4529 18.1809 11.6506C17.8388 11.9014 17.8616 12.4108 18.1581 12.7148C19.6785 14.2352 22.3392 16.8883 23.6087 18.1579C23.6847 18.2339 23.6847 18.3555 23.6087 18.4316L18.4317 23.6085C18.3557 23.6845 18.2341 23.6845 18.1581 23.6085C16.7974 22.2403 14.1067 19.5495 12.7154 18.1583L12.715 18.1579C12.411 17.8614 11.9016 17.8386 11.6508 18.1807C11.4531 18.4468 11.3923 18.6976 11.225 19.3894C10.1912 23.2436 11.187 27.5235 14.2126 30.5491C17.2382 33.5747 21.5181 34.5706 25.3724 33.5443C25.9653 33.3847 26.5507 33.1794 27.1132 32.921C27.2653 32.8525 27.4401 32.883 27.5541 33.0046L31.2335 36.6764\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Sections"},
   {"n":"sidebar/smart_driving","c":"vehicle","s":"<g transform=\"translate(-0.5898 -0.5042) scale(1.02124)\">{{part/steering_wheel}}</g>","g":"Sections"},
@@ -1547,17 +1551,18 @@ const partVariants={
   'part/direction_arrow:adjust_sync':straightArrow(24.14,20.13,8,1.95,{double:true}),
   'part/curved_airflow_arrow:seat':curvedAirflowArrow('M6.4 37.4V35.8Q6.4 24 21 24H32'),
   'part/play_triangle:solid':playbackTriangle(by['part/play_triangle'].s,true),
-  // Energy line pair: same bolt contour as the shared component, shown at 1.75x.
+  // Energy line pair: the shared bolt's six vertices and path order, opened up for standalone use at 1.7x:
+  // x scaled 1.25 about the centre and the waist band raised from 2 to 3.6, so a 2 px outline keeps room inside.
   // Outline stroke is normalised to 2 px; the solid's rounding stroke is part of its silhouette (not normalised),
-  // so it is set to 2/1.75 here: its outer edge then matches the outline's outer edge, as with lock / lock_fill.
-  'part/bolt:line':by['part/bolt'].s.match(/<path[^>]*stroke=[^>]*\/>/)[0].replace('stroke-width="1.5"','stroke-width="2"'),
-  'part/bolt:solid':by['part/bolt'].s.replace('stroke-width="1.5"','stroke-width="1.142857"'),
+  // so it is 2/1.7 here: its outer edge then matches the outline's outer edge, as with lock / lock_fill.
+  'part/bolt:line':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
+  'part/bolt:solid':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" fill="currentColor"/><path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="1.176471" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
   // Filled ego car: the whole body is solid (silhouette = outline's outer edge, mirrors unchanged);
-  // one 2 px groove keeps the hood line: the outline's hood curve, trimmed to its middle (x 16 to 31.77, t .373 to .627).
+  // one 2 px groove keeps the hood line: the outline's hood curve, trimmed to its middle (x 15.5 to 32.27, t .335 to .665).
   'part/car_front:solid':(()=>{
     const d=by['part/car_front'].s.match(/ d="([^"]+)"/)[1],sub=d.split(/(?=M)/);
     const mirrors=sub.filter(x=>!/[CZ]/i.test(x)).join(''),body=sub.find(x=>/Z/i.test(x));
-    const groove='M16 23.0633C18.7575 23.7369 21.355 24.0767 23.8858 24.0767C26.4165 24.0767 29.0141 23.7369 31.7716 23.0634';
+    const groove='M15.5 22.938C18.4443 23.6947 21.2026 24.0767 23.8858 24.0767C26.569 24.0767 29.3273 23.6948 32.2716 22.9381';
     const round='stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
     return `<defs><mask id="car-front-solid-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48"><path d="${body}" fill="#fff" stroke="#fff" ${round}/><path d="${groove}" fill="none" stroke="#000" ${round}/></mask></defs><rect width="48" height="48" fill="currentColor" mask="url(#car-front-solid-cut)"/><path d="${mirrors}" ${round} stroke="currentColor"/>`;
   })(),
@@ -2665,25 +2670,25 @@ function sameAspect(a,b){
   if(ay<.01||by<.01)return ay<.01&&by<.01;
   return Math.abs((ax/ay)/(bx/by)-1)<.002;
 }
-// Outline -> filled: the fill rises from the bottom of the drawing over the outline.
-// Filled -> outline: the fill drains downward from the top, uncovering the outline beneath.
-const POUR_MS=400,POUR_EASE='cubic-bezier(.3,0,.15,1)';
-function pourVariant(o,toSolid,still){
+// Outline <-> filled, like the theme reveal: a soft-edged circle grows from the centre of the drawing.
+// To filled: the filled copy spreads outward over the outline. To outline: the fill is hollowed out from the centre,
+// uncovering the outline. Copies carry the motion, so masked drawings (the car) keep repainting; the live drawing waits.
+const REVEAL_MS=380,REVEAL_EASE='cubic-bezier(.65,0,.35,1)';
+function revealVariant(o,toSolid,still){
   if(still){fill(o);return;}
-  const g=ghostOf();fill(o);
-  const outline=toSolid?g:big;let top=0,bottom=48;
-  try{const b=outline.getBBox();if(b.height>0){top=Math.max(0,b.y-1.5);bottom=Math.min(48,b.y+b.height+1.5);}}catch(e){}
-  const at=y=>`inset(${(y/48*100).toFixed(2)}% 0 0 0)`;
-  if(toSolid){
-    // A filled copy rises over the outline (its silhouette is the outline's outer edge, so it covers it exactly);
-    // the live drawing waits underneath. Animating a copy also keeps masked drawings (e.g. the car's windshield) repainting.
-    const f=ghostOf(),rise=motion(f,[{clipPath:at(bottom)},{clipPath:at(top)}],POUR_MS,0,POUR_EASE);
-    motion(big,[{opacity:0},{opacity:0}],POUR_MS);
-    afterMotion(rise,()=>{g.remove();f.remove();rise.cancel();});
-  }else{
-    const drain=motion(g,[{clipPath:at(top)},{clipPath:at(bottom)}],POUR_MS,0,POUR_EASE);afterMotion(drain,()=>{g.remove();drain.cancel();});
-  }
-  motion($('#part-links'),[{opacity:0},{opacity:1}],200,140,'linear');
+  const from=ghostOf();fill(o);
+  const outline=toSolid?from:big;let x=24,y=24,r=24;
+  try{const b=outline.getBBox();if(b.width>0){x=b.x+b.width/2;y=b.y+b.height/2;r=Math.hypot(b.width,b.height)/2+1.5;}}catch(e){}
+  const k=big.getBoundingClientRect().width/48,feather=r*.45,to=ghostOf();
+  // Two layers, as in the theme reveal: the new drawing shows inside the soft circle; the old one is removed only where
+  // the new is fully opaque, so nothing shows through (the car's groove) and no outline edge lingers around a fill.
+  // To filled the old outline is cut with a hard edge (nothing may show through the fill); to outline the fill dissolves
+  // with the same soft edge, complementary to the outline coming in.
+  [[from,toSolid?'reveal-old':'reveal-old-soft'],[to,'reveal-new']].forEach(([el,c])=>{el.classList.add(c);el.style.setProperty('--vx',x*k+'px');el.style.setProperty('--vy',y*k+'px');el.style.setProperty('--vf',feather*k+'px');});
+  const frames=[{'--vr':'0px'},{'--vr':(r+feather)*k+'px'}],grow=motion(to,frames,REVEAL_MS,0,REVEAL_EASE);
+  motion(from,frames,REVEAL_MS,0,REVEAL_EASE);motion(big,[{opacity:0},{opacity:0}],REVEAL_MS);
+  afterMotion(grow,()=>{from.remove();to.remove();grow.cancel();});
+  motion($('#part-links'),[{opacity:0},{opacity:1}],200,120,'linear');
 }
 function blendBig(o,still){
   const g=still?null:ghostOf();fill(o);
@@ -2748,7 +2753,7 @@ vseg.addEventListener('click',e=>{
   const line=by[sel].lineOf?by[by[sel].lineOf]:by[sel],n=b.dataset.v==='solid'?line.solid:line.n;
   if(!n||n===sel)return;
   clearMorph();clearTimeout(previewT);preview=null;focusPart(null);say('');
-  sel=n;markTile(selectedTile(line.n));pourVariant(by[n],b.dataset.v==='solid',lensReduced.matches);layoutLeads();
+  sel=n;markTile(selectedTile(line.n));revealVariant(by[n],b.dataset.v==='solid',lensReduced.matches);layoutLeads();
 });
 $('#back').onclick=e=>{if(trail.length)go(trail.pop(),{back:true,instant:e.detail===0});};
 function hoverTile(b){
