@@ -155,7 +155,8 @@ svg.ic{display:block;overflow:visible}
 @property --vr{syntax:"<length>";inherits:false;initial-value:0px}
 .ghost.reveal-new{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),#000 calc(var(--vr) - var(--vf)),transparent var(--vr));mask-image:radial-gradient(circle at var(--vx) var(--vy),#000 calc(var(--vr) - var(--vf)),transparent var(--vr))}
 .ghost.reveal-old-soft{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 var(--vr));mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 var(--vr))}
-.ghost.reveal-old{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 calc(var(--vr) - var(--vf) + .75px));mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf)),#000 calc(var(--vr) - var(--vf) + .75px))}
+/* The old drawing fades out 1px inside the new layer's fully opaque core, so no pixel is half-covered by both (no white seam). */
+.ghost.reveal-old{-webkit-mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf) - 1.5px),#000 calc(var(--vr) - var(--vf) - .5px));mask-image:radial-gradient(circle at var(--vx) var(--vy),transparent calc(var(--vr) - var(--vf) - 1.5px),#000 calc(var(--vr) - var(--vf) - .5px))}
 ::view-transition-group(root),::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition{pointer-events:none}
 .theme-changing,.theme-changing *{transition:none!important}
@@ -1092,7 +1093,7 @@ const ICONS=[
   {"n":"vehicle/oil_pressure","c":"vehicle","s":"<g transform=\"translate(24.0000 24.0000) scale(1.075000) translate(-24.0000 -24.0000)\"><path d=\"M21.7 21.9H16.3{{corner:16.3 21.9 13.9 21.9 13.9 24.3}}V26.1M21.7 21.9H27.918C28.1699 21.9 28.4189 21.8471 28.6491 21.7449L35.703 18.6098{{corner:35.703 18.6098 39.099973 17.100018 37.2269 20.311}}L31.2209 30.607{{corner:31.2209 30.607 30.699983 31.5 29.6661 31.5}}H16.3{{corner:16.3 31.5 13.9 31.5 13.9 29.1}}V26.1M21.7 21.9V16.5M13.9 26.1L8.5 23.1M21.7 16.5H18.7M21.7 16.5H24.7\" stroke-width=\"1.860465\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"38.5003\" cy=\"29.7\" r=\"1.68\" fill=\"currentColor\"/></g>","g":"Care"},
   {"n":"vehicle/coolant_temp","c":"vehicle","s":"{{part/thermometer:coolant}}<path d=\"M31 17.5H35M31 22H35M9 35C10.5 33 12 33 13.5 35C15 37 16.5 37 18 35M30 35C31.5 33 33 33 34.5 35C36 37 37.5 37 39 35\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>","g":"Care"},
   {"n":"vehicle/fuel_low","c":"vehicle","s":"<path d=\"M26.5 24.5V14.5{{corner:26.5 14.5 26.5 12.5 24.5 12.5}}H14.5{{corner:14.5 12.5 12.5 12.5 12.5 14.5}}V33.5{{corner:12.5 33.5 12.5 35.5 14.5 35.5}}H26.5V24.5ZM26.5 24.5H29{{corner:29 24.5 31 24.5 31 26.5}}V30C31 31.5 32.2 32.25 33.25 32.25C34.3 32.25 35.5 31.5 35.5 30V19.6213{{corner:35.5 19.6213 35.5 19 35.0607 18.5607}}L31.5 15M19.5 18V24.5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><circle cx=\"19.5002\" cy=\"29.3\" r=\"1.3\" fill=\"currentColor\"/>","g":"Care"},
-  {"n":"vehicle/child_lock_fill","c":"vehicle","s":"<g transform=\"translate(-4 -4.75) scale(1.16666667)\">{{part/lock_shackle}}</g><defs><mask id=\"child-lock-cutout\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g color=\"black\">{{part/child_symbol}}</g></mask></defs><g mask=\"url(#child-lock-cutout)\"><path d=\"M31.9167 18.1666{{corner:31.9167 18.1666 35.25 18.1666 35.25 21.4999}}V34.8332{{corner:35.25 34.8332 35.25 38.1666 31.9167 38.1666}}H16.0833{{corner:16.0833 38.1666 12.75 38.1666 12.75 34.8332}}V21.4999{{corner:12.75 21.4999 12.75 18.1666 16.0833 18.1666}}H31.9167Z\" fill-rule=\"evenodd\" clip-rule=\"evenodd\" fill=\"currentColor\"/></g>","g":"Keys & security","reviewed":true},
+  {"n":"vehicle/child_lock_fill","c":"vehicle","s":"<path d=\"M18.1667 19.625V16.7083C18.1667 13.4867 20.7783 10.875 24 10.875C27.2217 10.875 29.8333 13.4867 29.8333 16.7083V19.625\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><defs><mask id=\"child-lock-cutout\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g color=\"black\">{{part/child_symbol}}</g></mask></defs><g mask=\"url(#child-lock-cutout)\"><path d=\"M16.0833 19.625H31.9167{{corner:31.9167 19.625 34 19.625 34 21.7083}}V35.0417{{corner:34 35.0417 34 37.125 31.9167 37.125}}H16.0833{{corner:16.0833 37.125 14 37.125 14 35.0417}}V21.7083{{corner:14 21.7083 14 19.625 16.0833 19.625}}Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/><path d=\"M16.0833 19.625H31.9167{{corner:31.9167 19.625 34 19.625 34 21.7083}}V35.0417{{corner:34 35.0417 34 37.125 31.9167 37.125}}H16.0833{{corner:16.0833 37.125 14 37.125 14 35.0417}}V21.7083{{corner:14 21.7083 14 19.625 16.0833 19.625}}Z\" fill=\"currentColor\"/></g>","g":"Keys & security","reviewed":true},
   {"n":"vehicle/abs","c":"vehicle","s":"{{part/brake_ring:warning}}{{type:ABS|24 26.55 5.15 14.5 770}}","g":"Lights & safety"},
   {"n":"vehicle/window_lock","c":"vehicle","s":"<path d=\"M28.8419 17.7222L29.0508 15.1228{{corner:29.0508 15.1228 29.169933 13.6404 27.7964 13.6404}}H21.1825{{corner:21.1825 13.6404 17.745423 13.6404 15.7089 16.6053}}L9.79468 25.2156{{corner:9.79468 25.2156 7.954536 27.8946 11.2033 27.8946}}H22.9987\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/lock:window_lock}}","g":"Keys & security"},
   {"n":"vehicle/rear_display_lock","c":"vehicle","s":"<g transform=\"translate(24.0000 24.0000) scale(0.955000) translate(-24.0000 -24.0000)\"><path d=\"M38 21.53V14{{corner:38 14 38 11.5 35.5 11.5}}H12.5{{corner:12.5 11.5 10 11.5 10 14}}V23C10 23.5615 10.1851 24.0798 10.4976 24.4971M29.04 21.5H17{{corner:17 21.5 14.5 21.5 14.5 24}}V34{{corner:14.5 34 14.5 36.5 17 36.5}}H23.4867\" stroke-width=\"2.094241\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>{{part/lock:rear_display_lock}}</g>","g":"Keys & security"},
@@ -1446,8 +1447,12 @@ function curvedAirflowArrow(start,y=24){
 function playbackBar(x,y,width,height,radius,solid){
   return `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" ${solid?'fill="currentColor"':'stroke="currentColor" stroke-width="2"'}/>`;
 }
+// Filled drawings of an outline pair: the outline's own 2 px stroke with a fill on top, so the silhouette is the
+// outline's outer edge and the stroke follows the same 2 px normalisation (stroke first, so it is not a rounding edge).
+const fillOnly=body=>body.replace(/ stroke(?:-width|-linecap|-linejoin)?="[^"]*"/g,'').replace(/<(path|rect|circle) /g,'<$1 fill="currentColor" ');
+const solidOf=body=>body+fillOnly(body);
 function playbackTriangle(body,solid){
-  return solid?body.replace(/ stroke(?:-width|-linecap|-linejoin)?="[^"]*"/g,'').replace('<path ','<path fill="currentColor" '):body;
+  return solid?solidOf(body):body;
 }
 function skipTriangle({left=false,solid=false}={}){
   const triangle=playbackTriangle(by['part/play_triangle'].s,solid);
@@ -1458,7 +1463,7 @@ const transferArrow=straightArrow(23.75,17.5,21.5,5);
 const compactDirectionArrow=straightArrow(24,24,23,6.5);
 by['part/direction_arrow'].s=compactDirectionArrow;
 by['part/curved_airflow_arrow'].s=curvedAirflowArrow('M11 32V31Q11 20.5 25 20.5H32',20.5);
-by['part/pause_bar'].s=playbackBar(21,12,6,24,1.4,true);
+by['part/pause_bar'].s=solidOf(playbackBar(21,12,6,24,1.4,false));
 const partVariants={
   "part/chevron:glovebox": "<path d=\"M19.5 31.5L23.2929 35.2929{{corner:23.2929 35.2929 24 36 24.7071 35.2929}}L28.5 31.5\" stroke-width=\"1.877934\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   // Preserve the authored artwork of parts extracted from compound icons.
@@ -1555,6 +1560,7 @@ const partVariants={
   // x scaled 1.25 about the centre and the waist band raised from 2 to 3.6, so a 2 px outline keeps room inside.
   // Outline stroke is normalised to 2 px; the solid's rounding stroke is part of its silhouette (not normalised),
   // so it is 2/1.7 here: its outer edge then matches the outline's outer edge, as with lock / lock_fill.
+  'part/phone:filled':solidOf(by['part/phone'].s),
   'part/bolt:line':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
   'part/bolt:solid':'<path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" fill="currentColor"/><path d="M25.875 15.5L17.75 25.8H24L22.125 32.5L30.25 22.2H24L25.875 15.5Z" stroke-width="1.176471" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>',
   // Filled ego car: the whole body is solid (silhouette = outline's outer edge, mirrors unchanged);
@@ -1571,7 +1577,7 @@ const partVariants={
   'part/play_triangle:previous_solid':skipTriangle({left:true,solid:true}),
   'part/play_triangle:next_solid':skipTriangle({solid:true}),
   'part/pause_bar:outline':playbackBar(21,12,6,24,1.4,false),
-  'part/pause_bar:stop':playbackBar(11.5,13,3.5,22,1,true),
+  'part/pause_bar:stop':playbackBar(12.25,12.5,2,23,1,true),
   'part/pause_bar:stop_outline':playbackBar(12.25,12.5,2,23,1,true),
   'part/thermometer:bulb':by['part/thermometer'].s.match(/<path[^>]*\/>/g).slice(0,2).join(''),
   'part/car_top:open_door':carWithOpenDoor(),
@@ -1586,7 +1592,6 @@ const partVariants={
   'part/navigation_pointer:follow_route':navigationPointer(28.7893,23.3,7.15,14.4,4.1,.75),
   "part/bluetooth:audio":"<path d=\"M10.5001 18.4L18.8078 24M18.8078 24L27.1155 29.6L18.8078 36V24ZM18.8078 24V12L27.1155 18.4L18.8078 24ZM18.8078 24L10.5001 29.6\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/bluetooth:off":"<path d=\"M24.054 10V37.6L31.5 31.86M24.054 10L33.6078 17.36L14.5001 30.24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
-  "part/phone:filled":"<path d=\"M 14.905,10.5 L 16.4985,10.5 {{corner:16.4985 10.5 17.948533 10.5 18.5297 11.8284}} L 20.3306,15.9448 {{corner:20.3306 15.9448 20.991972 17.456528 19.8253 18.6232}} L 18.9738,19.4747 C 18.3381,20.1104 18.1598,21.011 18.6016,21.794 C 20.3099,24.8218 23.192,27.7038 26.2197,29.4121 C 27.0027,29.8539 27.9033,29.6756 28.539,29.0399 L 29.3905,28.1885 {{corner:29.3905 28.1885 30.557337 27.0218 32.0689 27.6831}} L 36.1853,29.484 {{corner:36.1853 29.484 37.5137 30.065167 37.5137 31.5152}} L 37.5137,33.1087 C 37.5137,35.7174 35.3398,37.8913 32.7311,37.4565 C 21.8615,35.7174 12.2963,26.1522 10.5571,15.2826 C 10.1224,12.6739 12.2963,10.5 14.905,10.5 Z\" fill=\"currentColor\"/>",
   "part/phone:with_direction":"<path d=\"M15.3966 15.1721H17.7431L20.0896 20.5355L17.7431 22.882C19.0839 25.899 22.1009 28.9159 25.1178 30.2568L27.4643 27.9103L32.8277 30.2568V32.6033C32.8277 34.6146 31.1516 36.2906 29.1404 35.9554C20.76 34.6146 13.3853 27.2398 12.0444 18.8595C11.7092 16.8482 13.3853 15.1721 15.3966 15.1721Z\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>",
   "part/weather_cloud:colored_1":"<path d=\"M15.4931 33.944C13.8241 33.996 12.2021 33.383 10.9851 32.24C9.76806 31.097 9.05506 29.517 9.00306 27.848C8.95106 26.179 9.56406 24.557 10.7071 23.34C11.8501 22.123 13.4301 21.41 15.0991 21.358C15.4691 19.413 16.4661 17.642 17.9391 16.318C19.4121 14.995 21.2781 14.191 23.2521 14.03C25.2261 13.869 27.1981 14.36 28.8651 15.429C30.5331 16.497 31.8041 18.082 32.4831 19.942C34.1671 20.154 35.7191 20.964 36.8561 22.224C37.9931 23.484 38.6401 25.111 38.6781 26.807C38.7161 28.504 38.1431 30.158 37.0641 31.468C35.9851 32.778 34.4711 33.657 32.7981 33.944H15.4931Z\" fill=\"url(#cloud-white)\" stroke=\"#A3AAB4\" stroke-width=\"0.9\" stroke-linejoin=\"round\"/>",
   'part/lane_lines:departure':by['part/lane_lines'].s.replace('M36 9V39','M33 9V39'),
@@ -1713,6 +1718,9 @@ Object.assign(partVariants,{
   "part/play_triangle:previous_solid": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(48 0) scale(-1 1)\"><g transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path fill=\"currentColor\" d=\"M15.9736 15.4321{{corner:15.9736 15.4321 15.9736 11.042385 19.6945 13.3671}}L36.0491 23.585{{corner:36.0491 23.585 39.354304 25.65 36.0491 27.715}}L19.6945 37.9329{{corner:19.6945 37.9329 15.9736 40.257615 15.9736 35.8679}}V15.4321Z\"/></g></g>",
   "part/play_triangle:next_solid": "<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0.1000202 9e-7) translate(24 24) scale(0.7745967) translate(-30.65 -25.65)\"><path fill=\"currentColor\" d=\"M15.9736 15.4321{{corner:15.9736 15.4321 15.9736 11.042385 19.6945 13.3671}}L36.0491 23.585{{corner:36.0491 23.585 39.354304 25.65 36.0491 27.715}}L19.6945 37.9329{{corner:19.6945 37.9329 15.9736 40.257615 15.9736 35.8679}}V15.4321Z\"/></g>"
 });
+// Filled skip triangles follow the shared outline geometry above (stroke + fill), so their silhouettes match.
+partVariants['part/play_triangle:previous_solid']=solidOf(partVariants['part/play_triangle:previous']);
+partVariants['part/play_triangle:next_solid']=solidOf(partVariants['part/play_triangle:next']);
 by["drive/charging_layer"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 0) translate(23.84 17.48) scale(0.8243179) translate(-24 -24)\">{{part/bolt}}</g><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M11 26.036L22.883 31.9775{{corner:22.883 31.9775 23.84 32.456 24.797 31.9775}}L36.68 26.036M11 31.921L22.883 37.8625{{corner:22.883 37.8625 23.84 38.341 24.797 37.8625}}L36.68 31.921\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>";
 by["vehicle/v2l"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 0) translate(17 24) scale(0.5043808) translate(-24 -24)\">{{part/bolt}}</g><path xmlns=\"http://www.w3.org/2000/svg\" d=\"M26 21.5V18.9996{{corner:26 18.9996 26 17 24 17}}H10{{corner:10 17 8 17 8 19}}V29{{corner:8 29 8 31 10 31}}H24{{corner:24 31 26 31 26 29.0003}}V26.5M26 21.5V26.5M26 21.5H28.5V26.5H26M33.5 24H40M36.5 27.5L40 24L36.5 20.5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"currentColor\"/>";
 by["drive/rear_camera_detection"].s="<g xmlns=\"http://www.w3.org/2000/svg\" transform=\"translate(0 -1.5)\"><g transform=\"translate(0 11.62) scale(.65)\">{{part/car_side:compact}}</g><defs><mask id=\"rear-camera-gap\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"48\" height=\"48\"><rect width=\"48\" height=\"48\" fill=\"white\"/><g color=\"black\" stroke=\"black\" stroke-width=\"2.6\"><g transform=\"translate(-1.2555985 1.3555601) translate(26.15 9.6) scale(0.5623166)\">{{part/pedestrian}}</g></g></mask></defs><g mask=\"url(#rear-camera-gap)\"><path d=\"M30.04 27.53A1.9 1.9 0 0 1 30.04 29.59M32.35 26.03A4.65 4.65 0 0 1 32.35 31.09M34.66 24.53A7.4 7.4 0 0 1 34.66 32.59\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" data-optical-stroke=\"1.4\"/></g><g transform=\"translate(-1.2555985 1.3555601) translate(26.15 9.6) scale(0.5623166)\">{{part/pedestrian}}</g></g>";
@@ -2553,7 +2561,7 @@ function poseFor(el,from,to){
 }
 let morphs=[],morphEpoch=0;
 function afterMotion(animation,callback){const epoch=morphEpoch;animation.onfinish=()=>{if(epoch===morphEpoch)callback();};}
-function clearMorph(){morphEpoch++;clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>{a.onfinish=null;a.cancel();});morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
+function clearMorph(){morphEpoch++;big.style.visibility='';clearPreviewMotion();$('#sl').classList.remove('clip');morphs.forEach(a=>{a.onfinish=null;a.cancel();});morphs=[];stage.querySelectorAll('.ghost').forEach(g=>g.remove());document.querySelectorAll('.label-arrow-ghost').forEach(g=>g.remove());big.querySelectorAll('.hold').forEach(x=>x.classList.remove('hold'));}
 function ghostOf(){
   const g=big.cloneNode(true);g.removeAttribute('id');g.classList.add('ghost');
   // Freeze the current highlight once: hover transitions must not compete with exit blur.
@@ -2673,21 +2681,31 @@ function sameAspect(a,b){
 // Outline <-> filled, like the theme reveal: a soft-edged circle grows from the centre of the drawing.
 // To filled: the filled copy spreads outward over the outline. To outline: the fill is hollowed out from the centre,
 // uncovering the outline. Copies carry the motion, so masked drawings (the car) keep repainting; the live drawing waits.
-const REVEAL_MS=380,REVEAL_EASE='cubic-bezier(.65,0,.35,1)';
+// Paced by area, not radius: the covered area follows a smoothstep, so the radius is sqrt(smoothstep(t)).
+// The fill grows evenly and settles at the end instead of bursting outward in the middle.
+const REVEAL_MS=520,REVEAL_EASE='linear(0, 0.106 6.25%, 0.207 12.5%, 0.304 18.75%, 0.395 25%, 0.482 31.25%, 0.562 37.5%, 0.638 43.75%, 0.707 50%, 0.77 56.25%, 0.827 62.5%, 0.876 68.75%, 0.919 75%, 0.953 81.25%, 0.978 87.5%, 0.994 93.75%, 1)';
 function revealVariant(o,toSolid,still){
   if(still){fill(o);return;}
   const from=ghostOf();fill(o);
   const outline=toSolid?from:big;let x=24,y=24,r=24;
   try{const b=outline.getBBox();if(b.width>0){x=b.x+b.width/2;y=b.y+b.height/2;r=Math.hypot(b.width,b.height)/2+1.5;}}catch(e){}
-  const k=big.getBoundingClientRect().width/48,feather=r*.45,to=ghostOf();
+  const k=big.getBoundingClientRect().width/48,feather=r*.35,to=ghostOf();
   // Two layers, as in the theme reveal: the new drawing shows inside the soft circle; the old one is removed only where
   // the new is fully opaque, so nothing shows through (the car's groove) and no outline edge lingers around a fill.
   // To filled the old outline is cut with a hard edge (nothing may show through the fill); to outline the fill dissolves
   // with the same soft edge, complementary to the outline coming in.
+  // Copies get their own mask / clip ids: url(#…) must not resolve to the hidden live drawing (an empty mask there
+  // would make the copy invisible, e.g. the car's body).
+  const ownIds=(el,k)=>{const map={};el.querySelectorAll('[id]').forEach(n=>{map[n.id]=n.id+'-'+k;n.id=map[n.id];});
+    if(Object.keys(map).length)el.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(at=>{if(at.value.includes('url(#'))at.value=at.value.replace(/url\(#([^)]+)\)/g,(m,id)=>map[id]?`url(#${map[id]})`:m);}));};
+  ownIds(from,'reveal-from');ownIds(to,'reveal-to');
   [[from,toSolid?'reveal-old':'reveal-old-soft'],[to,'reveal-new']].forEach(([el,c])=>{el.classList.add(c);el.style.setProperty('--vx',x*k+'px');el.style.setProperty('--vy',y*k+'px');el.style.setProperty('--vf',feather*k+'px');});
   const frames=[{'--vr':'0px'},{'--vr':(r+feather)*k+'px'}],grow=motion(to,frames,REVEAL_MS,0,REVEAL_EASE);
-  motion(from,frames,REVEAL_MS,0,REVEAL_EASE);motion(big,[{opacity:0},{opacity:0}],REVEAL_MS);
-  afterMotion(grow,()=>{from.remove();to.remove();grow.cancel();});
+  motion(from,frames,REVEAL_MS,0,REVEAL_EASE);
+  // Hide and restore the live drawing in the same callback that removes the copies: a separate opacity animation can
+  // finish a frame apart from the mask animation and double the edges for one frame (a visible flash).
+  big.style.visibility='hidden';
+  afterMotion(grow,()=>{big.style.visibility='';from.remove();to.remove();grow.cancel();});
   motion($('#part-links'),[{opacity:0},{opacity:1}],200,120,'linear');
 }
 function blendBig(o,still){
