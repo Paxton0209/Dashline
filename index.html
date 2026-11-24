@@ -2429,6 +2429,9 @@ function closeInsp(){
   // Resetting Copied to Copy SVG here would flash during the shrinking motion.
   freezeCopyForClose();
   sheet.getAnimations({subtree:true}).filter(a=>!lensMotion.includes(a)).forEach(a=>a.pause());
+  // Closing on a filled variant: dissolve back to the outline while the dialog shrinks, so it lands as the tile shows it.
+  const lineName=by[sel]?.lineOf;
+  if(lineName&&!lensReduced.matches){clearMorph();sel=lineName;revealVariant(by[lineName],false,false);}
   if(lensReduced.matches){finishLens();return;}
   const tileName=by[sel]?.lineOf||sel,source=sourceFor(tileName,lensAnchor)||sourceFor(tileName,selectedTile(tileName));
   const currentSheet=sheet.getBoundingClientRect(),currentArt=stage.getBoundingClientRect();
