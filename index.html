@@ -150,10 +150,6 @@ svg.ic{display:block;overflow:visible}
 
 
 /* DriveScene Studio appearance control and root reveal. */
-.theme-toggle{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:var(--ds-radius-control);color:var(--ink);touch-action:manipulation;transition:background-color 120ms,color 160ms,opacity 150ms,scale 110ms ease-out}
-.theme-toggle>svg{width:18px;height:18px;display:block}
-.theme-toggle:hover{background:transparent;color:var(--ink)}
-.theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @property --theme-reveal-progress{syntax:"<length>";inherits:false;initial-value:0px}
 ::view-transition-group(root),::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition{pointer-events:none}
@@ -586,7 +582,7 @@ body.leading .stage .keys>g{opacity:1}
 }
 
 /* ---- Layout trial: search heads the sidebar column; no toolbar row in the panel ---- */
-.app,body.xray .app{grid-template:"find main" auto "side main" minmax(0,1fr) "tog main" auto "credit main" auto / 260px minmax(0,1fr)}
+.app,body.xray .app{grid-template:"find main" auto "side main" minmax(0,1fr) "credit main" auto / 260px minmax(0,1fr)}
 .app>.find{grid-area:find;align-self:start;width:auto;max-width:none;margin:12px 12px 0;background:transparent}
 .side{padding:12px 12px 12px}
 .mhead[hidden]{display:none}
@@ -600,16 +596,11 @@ body.leading .stage .keys>g{opacity:1}
 .gh small{display:inline;margin-left:8px}
 .gh b,.gh small{display:inline}
 /* Appearance belongs to the page, not to navigation: it sits in the panel's top-right corner. */
-/* Appearance is a site-level control: last item of the sidebar column, on the search / category left line, apart from the footer links. */
-.app>.theme-toggle{grid-area:tog;justify-self:start;margin:0 0 12px 13px;background:transparent}
 /* Group labels stick to the top of the panel; the appearance button lives at the right end of that row. */
 .scroll{padding-top:0;mask-image:linear-gradient(to bottom,#000 calc(100% - var(--library-fade-bottom,0px)),transparent)}
 .gh{position:sticky;top:0;z-index:2;display:flex;align-items:center;height:56px;padding:0;margin-bottom:-6px;background:var(--panel);transition:background-color .4s}
-.app>.theme-toggle{transition:background-color .4s,color 160ms,opacity 150ms,scale 110ms ease-out}
 .grp{padding-top:16px}
 .grp:first-child{padding-top:0}
-.app>.theme-toggle{color:var(--t3)}
-.app>.theme-toggle:hover,.app>.theme-toggle:focus-visible{background:transparent;color:var(--ink)}
 /* Search is a field: recessed, so it never reads like the raised selected category. */
 .app>.find{height:36px;border-color:transparent;background:var(--fill)}
 .app>.find:focus-within{background:var(--fill);border-color:var(--accent)}
@@ -633,10 +624,8 @@ body.leading .stage .keys>g{opacity:1}
 .vseg[data-v=solid] .ind{transform:translateX(100%)}
 @media(prefers-reduced-motion:reduce){.vseg .ind{transition:none}}
 @media(max-width:900px){
-  .app,body.xray .app{grid-template:"find tog" auto "side side" auto "main main" minmax(0,1fr) "credit credit" auto / minmax(0,1fr) auto}
+  .app,body.xray .app{grid-template:"find" auto "side" auto "main" minmax(0,1fr) "credit" auto / minmax(0,1fr)}
   .app>.find{margin:8px 8px 0}
-  .app>.find{margin:8px 0 0 8px}
-  .app>.theme-toggle{align-self:center;margin:8px 8px 0 4px}
   .gh{height:48px}
   .side{padding:8px 8px 0}
   .social-links{margin:4px 16px 8px}
@@ -672,7 +661,6 @@ body.leading .stage .keys>g{opacity:1}
       <a href="https://x.com/Parker_EV_UX" aria-label="X" title="X" target="_blank" rel="noopener noreferrer">X</a>
       <a href="https://www.xiaohongshu.com/user/profile/59618b7c82ec3953470d5cca" aria-label="Rednote" title="Rednote" target="_blank" rel="noopener noreferrer" class="rednote">Rednote</a>
     </nav>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false"><svg data-appearance width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.25a6.75 6.75 0 0 0 0 13.5Z" fill="currentColor"/></svg></button>
 </div>
 
 <div class="tcap" id="tcap" aria-hidden="true"></div>
@@ -1982,15 +1970,11 @@ try{
   P={scheme:saved.scheme==='light'||saved.scheme==='dark'?saved.scheme:saved.darkMode===true?'dark':null,px:saved.px??P.px,cat:saved.cat&&saved.cat!=='part'?saved.cat:'general',xray:saved.xray===true};
 }catch(e){}
 const save=()=>{try{localStorage.setItem('dsi4',JSON.stringify(P))}catch(e){}};
-const darkSwitch=$('#theme-toggle');
 const systemDark=matchMedia('(prefers-color-scheme: dark)');
 const isDarkNow=()=>P.scheme?P.scheme==='dark':systemDark.matches;
 function applyTheme(){
   const isDark=isDarkNow();
   document.documentElement.dataset.theme=isDark?'dark':'light';
-  darkSwitch.title=isDark?'Switch to light theme':'Switch to dark theme';
-  darkSwitch.setAttribute('aria-label',darkSwitch.title);
-  darkSwitch.setAttribute('aria-pressed',String(isDark));
 }
 // Two-state toggle over three stored states: a choice that matches the system clears the override.
 function setTheme(dark){
@@ -2013,9 +1997,9 @@ async function toggleTheme(){
   try{
     while(isDarkNow()!==requestedDark){
       const dark=requestedDark;
-      const bounds=darkSwitch.getBoundingClientRect();
-      const x=bounds.left+bounds.width/2;
-      const y=bounds.top+bounds.height/2;
+      // No visible button: the D-key reveal grows from the centre of the window.
+      const x=innerWidth/2;
+      const y=innerHeight/2;
       const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))+180;
       root.style.setProperty('--theme-reveal-x',x+'px');
       root.style.setProperty('--theme-reveal-y',y+'px');
@@ -2038,7 +2022,6 @@ async function toggleTheme(){
   }
 }
 applyTheme();
-darkSwitch.onclick=toggleTheme;
 
 /* unified selection motion: stretch toward target, settle with a small overshoot */
 function slide(el,axis,from,to,ms=380){
